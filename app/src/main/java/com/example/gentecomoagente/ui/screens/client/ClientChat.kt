@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.gentecomoagente.model.ChatMessage
@@ -27,34 +28,36 @@ fun ChatClientScreen(navController: NavController) {
     // ESTADOS
     var inputText by remember { mutableStateOf("") }
 
-    // Lista de mensagens inicial (simulando um histórico)
+    val ticketNumber = "TKT-001234"
+
     val messages = remember {
         mutableStateListOf(
             ChatMessage(
                 "Olá, Gustavo. Tudo bem? Vou te ajudar com o seu problema de acesso.",
                 isFromClient = false
             ),
-            ChatMessage("Estou com um problema ao acessar o site de vendas. Toda vez que clico em 'carrinho' a página atualiza e eu perco os produtos selecionados.", isFromClient = true)
+            ChatMessage(
+                "Estou com um problema ao acessar o site de vendas. Toda vez que clico em 'carrinho' a página atualiza e eu perco os produtos selecionados.",
+                isFromClient = true
+            )
         )
     }
 
-    // Estado para simular se o atendente está digitando
     var isAgentTyping by remember { mutableStateOf(true) }
 
-    // Controle de Scroll da lista
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
-    // Container Principal
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // --- 1. CABEÇALHO ---
+
+        // --- CABEÇALHO ---
         Column(modifier = Modifier.padding(16.dp)) {
             Button(
-                onClick = { navController.popBackStack() }, // Volta para a tela anterior
+                onClick = { navController.popBackStack() },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFEEEEEE),
                     contentColor = Color.Black
@@ -62,49 +65,62 @@ fun ChatClientScreen(navController: NavController) {
                 shape = RoundedCornerShape(8.dp),
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
             ) {
-                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Voltar")
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Voltar"
+                )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Voltar")
             }
         }
 
-        Divider(color = Color(0xFF81D4FA), thickness = 1.dp) // Linha azul clara
+        Divider(color = Color(0xFF81D4FA), thickness = 1.dp)
 
-        // --- 2. ÁREA DE CHAT (Ocupa o espaço restante) ---
+        // --- NÚMERO DO TICKET ---
+        Text(
+            text = "Ticket: $ticketNumber",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.titleMedium,
+            color = Color.DarkGray
+        )
+
+        // --- ÁREA DE CHAT ---
         Box(
             modifier = Modifier
-                .weight(1f) // Faz essa caixa empurrar o rodapé para baixo
+                .weight(1f)
                 .padding(16.dp)
-                .background(Color(0xFFF5F5F5)) // Fundo cinza claro
-                .border(1.dp, Color.Black) // Borda preta
+                .background(Color(0xFFF5F5F5))
+                .border(1.dp, Color.Black)
         ) {
             LazyColumn(
                 state = listState,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp) // Espaço entre as mensagens
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Renderiza todas as mensagens da lista
+
                 items(messages) { msg ->
                     ChatMessageBubble(message = msg)
                 }
 
-                // Renderiza o indicador de digitação se for verdadeiro
                 if (isAgentTyping) {
                     item { TypingIndicator() }
                 }
             }
         }
 
-        // --- 3. RODAPÉ (Área de Envio) ---
+        // --- RODAPÉ ---
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Campo de Texto
+
             OutlinedTextField(
                 value = inputText,
                 onValueChange = { inputText = it },
@@ -121,28 +137,31 @@ fun ChatClientScreen(navController: NavController) {
                 ),
                 shape = RoundedCornerShape(8.dp)
             )
+
             Spacer(modifier = Modifier.width(12.dp))
 
-            // Botão Enviar
             Button(
                 onClick = {
                     if (inputText.isNotBlank()) {
-                        // 1. Adiciona a mensagem na lista
-                        messages.add(ChatMessage(text = inputText, isFromClient = false))
-                        // 2. Limpa o campo
+                        messages.add(
+                            ChatMessage(
+                                text = inputText,
+                                isFromClient = true
+                            )
+                        )
                         inputText = ""
-                        // 3. Rola a tela para o final
+
                         coroutineScope.launch {
                             listState.animateScrollToItem(messages.size)
                         }
                     }
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4CAF50), // Verde
+                    containerColor = Color(0xFF4CAF50),
                     contentColor = Color.White
                 ),
                 shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.height(56.dp) // Altura igual a do TextField
+                modifier = Modifier.height(56.dp)
             ) {
                 Text("Enviar")
             }
