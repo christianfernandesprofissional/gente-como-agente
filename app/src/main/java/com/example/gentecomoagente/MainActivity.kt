@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.gentecomoagente.ui.navigation.AppNavigation
+import com.example.gentecomoagente.ui.screens.client.ExistingTicketScreen
 import com.example.gentecomoagente.ui.theme.GenteComoAgenteTheme
 
 class MainActivity : ComponentActivity() {
@@ -21,14 +22,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AppNavigation()
-//            GenteComoAgenteTheme {
-//                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-//                    Greeting(
-//                        name = "Android",
-//                        modifier = Modifier.padding(innerPadding)
-//                    )
-//                }
-//            }
+
         }
     }
 }

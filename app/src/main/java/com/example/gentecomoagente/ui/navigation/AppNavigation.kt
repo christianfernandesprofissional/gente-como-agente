@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.gentecomoagente.ui.screens.HomeScreen
+import com.example.gentecomoagente.ui.screens.client.ExistingTicketScreen
 
 @Composable
 fun AppNavigation() {
@@ -12,11 +13,15 @@ fun AppNavigation() {
     val navController = rememberNavController()
 
     // O NavHost é o mapa. O startDestination é a tela que abre primeiro.
-    NavHost(navController = navController, startDestination = "support_screen") {
+    NavHost(navController = navController, startDestination = "ticket_screen") {
 
         // Rota 1: Tela de Suporte
         composable("support_screen") {
             HomeScreen(navController = navController)
+        }
+
+        composable("ticket_screen") {
+            ExistingTicketScreen(navController = navController)
         }
 
         // Quando você criar outras telas, é só adicionar aqui:
