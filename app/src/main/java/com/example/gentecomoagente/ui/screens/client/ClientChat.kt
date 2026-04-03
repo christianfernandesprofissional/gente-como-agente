@@ -32,9 +32,9 @@ fun ChatClientScreen(navController: NavController) {
         mutableStateListOf(
             ChatMessage(
                 "Olá, Gustavo. Tudo bem? Vou te ajudar com o seu problema de acesso.",
-                isFromAgent = false
+                isFromClient = false
             ),
-            ChatMessage("Estou com um problema ao acessar o site de vendas. Toda vez que clico em 'carrinho' a página atualiza e eu perco os produtos selecionados.", isFromAgent = true)
+            ChatMessage("Estou com um problema ao acessar o site de vendas. Toda vez que clico em 'carrinho' a página atualiza e eu perco os produtos selecionados.", isFromClient = true)
         )
     }
 
@@ -128,7 +128,7 @@ fun ChatClientScreen(navController: NavController) {
                 onClick = {
                     if (inputText.isNotBlank()) {
                         // 1. Adiciona a mensagem na lista
-                        messages.add(ChatMessage(text = inputText, isFromAgent = true))
+                        messages.add(ChatMessage(text = inputText, isFromClient = false))
                         // 2. Limpa o campo
                         inputText = ""
                         // 3. Rola a tela para o final

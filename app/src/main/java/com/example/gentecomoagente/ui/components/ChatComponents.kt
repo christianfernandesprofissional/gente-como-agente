@@ -16,9 +16,9 @@ import com.example.gentecomoagente.model.ChatMessage
 @Composable
 fun ChatMessageBubble(message: ChatMessage) {
     // Define as cores e alinhamentos baseados em quem enviou
-    val backgroundColor = if (message.isFromAgent) Color(0xFF00838F) else Color(0xFFE0F7FA)
-    val textColor = if (message.isFromAgent) Color.White else Color.Black
-    val alignment = if (message.isFromAgent) Arrangement.End else Arrangement.Start
+    val backgroundColor = if (message.isFromClient) Color(0xFF00838F) else Color(0xFFE0F7FA)
+    val textColor = if (message.isFromClient) Color.White else Color.Black
+    val alignment = if (message.isFromClient) Arrangement.End else Arrangement.Start
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -27,7 +27,7 @@ fun ChatMessageBubble(message: ChatMessage) {
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.8f) // O balão ocupa no máximo 80% da tela
-                .wrapContentWidth(if (message.isFromAgent) Alignment.End else Alignment.Start)
+                .wrapContentWidth(if (message.isFromClient) Alignment.End else Alignment.Start)
                 .background(
                     color = backgroundColor,
                     shape = RoundedCornerShape(12.dp)
