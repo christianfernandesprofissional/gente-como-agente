@@ -10,6 +10,7 @@ import com.example.gentecomoagente.ui.screens.agent.AtendimentoScreen
 import com.example.gentecomoagente.ui.screens.agent.TicketsAgentScreen
 import com.example.gentecomoagente.ui.screens.client.ChatClientScreen
 import com.example.gentecomoagente.ui.screens.client.ExistingTicketScreen
+import com.example.gentecomoagente.ui.screens.gerente.GerenteHomeScreen
 
 @Composable
 fun AppNavigation() {
@@ -17,7 +18,7 @@ fun AppNavigation() {
     val navController = rememberNavController()
 
     // O NavHost é o mapa. O startDestination é a tela que abre primeiro.
-    NavHost(navController = navController, startDestination = "chat_client_screen") {
+    NavHost(navController = navController, startDestination = "gerente_home_screen") {
 
         // Rota 1: Tela de Suporte
         composable("support_screen") {
@@ -44,8 +45,9 @@ fun AppNavigation() {
         composable("chat_agent_screen") {
             AtendimentoScreen(navController = navController)
         }
-
-        // Quando você criar outras telas, é só adicionar aqui:
-        // composable("employee_screen") { EmployeeScreen(navController) }
+        // Rota 7: Tela de Home do Gerente
+        composable("gerente_home_screen") {
+            GerenteHomeScreen(navController = navController)
+        }
     }
 }
