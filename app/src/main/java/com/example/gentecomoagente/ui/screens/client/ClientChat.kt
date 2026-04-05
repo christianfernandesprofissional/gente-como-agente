@@ -1,5 +1,6 @@
 package com.example.gentecomoagente.ui.screens.client
 
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -19,6 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.gentecomoagente.model.ChatMessage
 import com.example.gentecomoagente.ui.components.ChatMessageBubble
+import com.example.gentecomoagente.ui.components.CustomButton
+import com.example.gentecomoagente.ui.components.CustomTopHeader
 import com.example.gentecomoagente.ui.components.TypingIndicator
 import kotlinx.coroutines.launch
 
@@ -27,7 +30,6 @@ import kotlinx.coroutines.launch
 fun ChatClientScreen(navController: NavController) {
     // ESTADOS
     var inputText by remember { mutableStateOf("") }
-
     val ticketNumber = "TKT-001234"
 
     val messages = remember {
@@ -53,28 +55,12 @@ fun ChatClientScreen(navController: NavController) {
             .fillMaxSize()
             .background(Color.White)
     ) {
-
-        // --- CABEÇALHO ---
-        Column(modifier = Modifier.padding(16.dp)) {
-            Button(
-                onClick = { navController.popBackStack() },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFEEEEEE),
-                    contentColor = Color.Black
-                ),
-                shape = RoundedCornerShape(8.dp),
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Voltar"
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Voltar")
-            }
-        }
-
-        Divider(color = Color(0xFF81D4FA), thickness = 1.dp)
+        // --- CABEÇALHO (Refatorado) ---
+        CustomTopHeader(
+            buttonText = "Voltar",
+            buttonIcon = Icons.Default.ArrowBack,
+            onClickButton = { navController.popBackStack() }
+        )
 
         // --- NÚMERO DO TICKET ---
         Text(
@@ -102,7 +88,6 @@ fun ChatClientScreen(navController: NavController) {
                     .padding(12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-
                 items(messages) { msg ->
                     ChatMessageBubble(message = msg)
                 }
@@ -120,7 +105,6 @@ fun ChatClientScreen(navController: NavController) {
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             OutlinedTextField(
                 value = inputText,
                 onValueChange = { inputText = it },
@@ -140,7 +124,9 @@ fun ChatClientScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Button(
+            // --- BOTÃO ENVIAR (Refatorado) ---
+            CustomButton(
+                text = "Enviar",
                 onClick = {
                     if (inputText.isNotBlank()) {
                         messages.add(
@@ -156,15 +142,10 @@ fun ChatClientScreen(navController: NavController) {
                         }
                     }
                 },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4CAF50),
-                    contentColor = Color.White
-                ),
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.height(56.dp)
-            ) {
-                Text("Enviar")
-            }
+                containerColor = Color(0xFF4CAF50), // Verde
+                contentColor = Color.White,
+                modifier = Modifier.height(56.dp) // Mantém a altura igual a do campo de texto
+            )
         }
     }
 }

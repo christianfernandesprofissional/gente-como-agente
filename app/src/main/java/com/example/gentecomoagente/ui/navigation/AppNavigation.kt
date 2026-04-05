@@ -21,7 +21,7 @@ fun AppNavigation() {
     val navController = rememberNavController()
 
     // O NavHost é o mapa. O startDestination é a tela que abre primeiro.
-    NavHost(navController = navController, startDestination = "login_screen") {
+    NavHost(navController = navController, startDestination = "chat_client_screen") {
 
         // Rota 1: Tela de Suporte
         composable("support_screen") {
