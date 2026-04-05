@@ -10,7 +10,10 @@ import com.example.gentecomoagente.ui.screens.agent.AtendimentoScreen
 import com.example.gentecomoagente.ui.screens.agent.TicketsAgentScreen
 import com.example.gentecomoagente.ui.screens.client.ChatClientScreen
 import com.example.gentecomoagente.ui.screens.client.ExistingTicketScreen
+import com.example.gentecomoagente.ui.screens.gerente.AgentCreationScreen
 import com.example.gentecomoagente.ui.screens.gerente.GerenteHomeScreen
+import com.example.gentecomoagente.ui.screens.gerente.GerenteTicketScreen
+import com.example.gentecomoagente.ui.screens.gerente.ProblemTypeScreen
 
 @Composable
 fun AppNavigation() {
@@ -18,7 +21,7 @@ fun AppNavigation() {
     val navController = rememberNavController()
 
     // O NavHost é o mapa. O startDestination é a tela que abre primeiro.
-    NavHost(navController = navController, startDestination = "gerente_home_screen") {
+    NavHost(navController = navController, startDestination = "agent_creation_screen") {
 
         // Rota 1: Tela de Suporte
         composable("support_screen") {
@@ -48,6 +51,21 @@ fun AppNavigation() {
         // Rota 7: Tela de Home do Gerente
         composable("gerente_home_screen") {
             GerenteHomeScreen(navController = navController)
+        }
+
+        // Rota 8: Tela de Tickets do Gerente
+        composable("gerente_ticket_screen") {
+            GerenteTicketScreen(navController = navController)
+        }
+
+        // Rota 9: Tela de Tipos de problema
+        composable("problem_type_screen") {
+            ProblemTypeScreen(navController = navController)
+        }
+
+        // Rota 10: Tela de cadastro de agente
+        composable("agent_creation_screen") {
+            AgentCreationScreen(navController = navController)
         }
     }
 }
