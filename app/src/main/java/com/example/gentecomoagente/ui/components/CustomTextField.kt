@@ -43,14 +43,17 @@ fun CustomTextField(
             singleLine = singleLine,
             minLines = minLines,
             readOnly = readOnly,
-            visualTransformation = visualTransformation, // Aplica a máscara (bolinhas)
-            keyboardOptions = keyboardOptions, // Muda o teclado (ex: teclado de números)
+            visualTransformation = visualTransformation,
+            keyboardOptions = keyboardOptions,
             shape = RoundedCornerShape(8.dp),
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color(0xFFF5F5F5), // Cinza bem claro
+                focusedContainerColor = Color(0xFFF5F5F5),
                 unfocusedContainerColor = Color(0xFFF5F5F5),
-                focusedIndicatorColor = Color.Transparent, // Remove a linha de baixo
-                unfocusedIndicatorColor = Color.Transparent
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                // 👇 ADICIONE ESTAS DUAS LINHAS PARA EVITAR TEXTO INVISÍVEL NO MODO ESCURO:
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black
             )
         )
     }
