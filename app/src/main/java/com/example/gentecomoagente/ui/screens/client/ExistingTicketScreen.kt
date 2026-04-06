@@ -17,6 +17,8 @@ import com.example.gentecomoagente.ui.components.CustomBadge
 import com.example.gentecomoagente.ui.components.CustomButton
 import com.example.gentecomoagente.ui.components.CustomDropdown
 import com.example.gentecomoagente.ui.components.CustomTextField
+import com.example.gentecomoagente.ui.navigation.Routes
+
 @Composable
 fun ExistingTicketScreen(navController: NavController) {
     // ESTADOS
@@ -53,7 +55,7 @@ fun ExistingTicketScreen(navController: NavController) {
             ) {
                 CustomButton(
                     text = "Acessar como Funcionário",
-                    onClick = { /* Ação */ }
+                    onClick = { navController.navigate(Routes.LOGIN) }
                 )
             }
 
@@ -125,7 +127,7 @@ fun ExistingTicketScreen(navController: NavController) {
             ) {
                 CustomButton(
                     text = "Novo Ticket",
-                    onClick = { /* Ação */ },
+                    onClick = { navController.popBackStack() },
                     modifier = Modifier.weight(1f)
                 )
 

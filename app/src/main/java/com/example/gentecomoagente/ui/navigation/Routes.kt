@@ -4,8 +4,8 @@ package com.example.gentecomoagente.ui.navigation
 object Routes {
 
     // Cliente
-    const val SUPPORT = "support_screen"
-    const val TICKET = "ticket_screen"
+    const val TELA_INICIAL = "tela_inicial"
+    const val TICKET_EXISTENTE = "ticket_screen"
     const val CHAT_CLIENT = "chat_client_screen"
 
     // Autenticação

@@ -21,14 +21,14 @@ fun AppNavigation() {
     val navController = rememberNavController()
 
     // O NavHost é o mapa. O startDestination é a tela que abre primeiro.
-    NavHost(navController = navController, startDestination = "chat_client_screen") {
+    NavHost(navController = navController, startDestination = Routes.TELA_INICIAL) {
 
         // Rota 1: Tela de Suporte
-        composable(Routes.SUPPORT) {
+        composable(Routes.TELA_INICIAL) {
             HomeScreen(navController = navController)
         }
         // Rota 2: Tela de busca de ticket existente
-        composable(Routes.TICKET) {
+        composable(Routes.TICKET_EXISTENTE) {
             ExistingTicketScreen(navController = navController)
         }
         // Rota 3: Tela de chat de atendimento do cliente

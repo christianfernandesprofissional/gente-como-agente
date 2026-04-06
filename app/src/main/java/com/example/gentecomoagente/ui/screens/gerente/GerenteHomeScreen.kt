@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.gentecomoagente.model.AgentModel
 import com.example.gentecomoagente.ui.components.CustomButton
+import com.example.gentecomoagente.ui.navigation.Routes
 
 
 @Composable
@@ -54,7 +55,7 @@ fun GerenteHomeScreen(navController: NavController) {
 
                     CustomButton(
                         text = "Tipos de Problema",
-                        onClick = { /* Ação */ },
+                        onClick = { navController.navigate(Routes.PROBLEM_TYPE)},
                         modifier = Modifier.weight(1f).height(48.dp),
                         shape = RectangleShape,
                         containerColor = Color(0xFFE0E0E0),
@@ -80,7 +81,7 @@ fun GerenteHomeScreen(navController: NavController) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 CustomButton(
                     text = "Visualizar Tickets",
-                    onClick = { /* Ação */ },
+                    onClick = { navController.navigate(Routes.GERENTE_TICKETS) },
                     modifier = Modifier.weight(1f).height(56.dp),
                     shape = RectangleShape,
                     containerColor = Color(0xFFE0E0E0),
@@ -91,7 +92,7 @@ fun GerenteHomeScreen(navController: NavController) {
 
                 CustomButton(
                     text = "Cadastrar Novo Agente",
-                    onClick = { /* Ação */ },
+                    onClick = { navController.navigate(Routes.AGENT_CREATION) },
                     modifier = Modifier.weight(1f).height(56.dp),
                     shape = RectangleShape,
                     containerColor = Color(0xFFE0E0E0),

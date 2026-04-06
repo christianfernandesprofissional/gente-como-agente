@@ -16,6 +16,7 @@ import androidx.navigation.NavController
 import com.example.gentecomoagente.ui.components.CustomButton
 import com.example.gentecomoagente.ui.components.CustomTextField
 import com.example.gentecomoagente.ui.components.CustomTopHeader
+import com.example.gentecomoagente.ui.navigation.Routes
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -66,7 +67,23 @@ fun LoginScreen(navController: NavController) {
 
                 CustomButton(
                     text = "Entrar",
-                    onClick = { /* Ação */ },
+                    onClick = {
+                        when (username.trim()) {
+
+                            "gerente@atendimento" -> {
+                                navController.navigate(Routes.GERENTE_HOME)
+                            }
+
+                            "agente@atendimento" -> {
+                                navController.navigate(Routes.TICKETS_AGENT)
+                            }
+
+                            else -> {
+                                // Opcional: mostrar erro
+                                println("Usuário inválido")
+                            }
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth(0.6f),
                     containerColor = Color(0xFFBDBDBD)
                 )

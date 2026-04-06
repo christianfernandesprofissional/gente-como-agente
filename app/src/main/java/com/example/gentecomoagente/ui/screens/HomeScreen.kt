@@ -19,6 +19,7 @@ import androidx.navigation.NavController
 import com.example.gentecomoagente.ui.components.CustomButton
 import com.example.gentecomoagente.ui.components.CustomDropdown
 import com.example.gentecomoagente.ui.components.CustomTextField
+import com.example.gentecomoagente.ui.navigation.Routes
 
 
 @Composable
@@ -54,7 +55,7 @@ fun HomeScreen(navController: NavController) {
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
                     CustomButton(
                         text = "Acessar como Funcionário",
-                        onClick = { /* Futura navegação */ }
+                        onClick = { navController.navigate(Routes.LOGIN) }
                     )
                 }
 
@@ -124,13 +125,13 @@ fun HomeScreen(navController: NavController) {
                 ) {
                     CustomButton(
                         text = "Ticket Existente",
-                        onClick = { /* Ação */ },
+                        onClick = { navController.navigate(Routes.TICKET_EXISTENTE) },
                         modifier = Modifier.weight(1f)
                     )
 
                     CustomButton(
                         text = "Iniciar Atendimento",
-                        onClick = { /* Ação */ },
+                        onClick = { navController.navigate(Routes.CHAT_CLIENT) },
                         modifier = Modifier.weight(1f)
                     )
                 }

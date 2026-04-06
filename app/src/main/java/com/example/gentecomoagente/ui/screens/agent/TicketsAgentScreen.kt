@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.gentecomoagente.model.TicketModel
 import com.example.gentecomoagente.ui.components.CustomButton
+import com.example.gentecomoagente.ui.navigation.Routes
 
 
 @Composable
@@ -91,7 +92,7 @@ fun TicketsAgentScreen(navController: NavController) {
                     TicketListItem(
                         ticket = ticket,
                         onActionClick = {
-                            println("Clicou no ticket: ${ticket.id}")
+                            navController.navigate(Routes.CHAT_AGENT)
                         }
                     )
                 }
