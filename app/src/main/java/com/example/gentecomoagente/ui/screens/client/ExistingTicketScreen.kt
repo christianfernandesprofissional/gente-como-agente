@@ -17,8 +17,6 @@ import com.example.gentecomoagente.ui.components.CustomBadge
 import com.example.gentecomoagente.ui.components.CustomButton
 import com.example.gentecomoagente.ui.components.CustomDropdown
 import com.example.gentecomoagente.ui.components.CustomTextField
-
-
 @Composable
 fun ExistingTicketScreen(navController: NavController) {
     // ESTADOS
@@ -40,16 +38,15 @@ fun ExistingTicketScreen(navController: NavController) {
             .background(Color.White)
             .padding(16.dp)
     ) {
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center // 👈 CENTRALIZA
+            verticalArrangement = Arrangement.Center // Centraliza o conteúdo verticalmente
         ) {
 
-            // --- CABEÇALHO ---
+            // --- CABEÇALHO ESPECÍFICO DESTA TELA ---
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.TopEnd
@@ -71,10 +68,7 @@ fun ExistingTicketScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Divider(
-                color = Color(0xFF81D4FA),
-                thickness = 1.dp
-            )
+            Divider(color = Color(0xFF81D4FA), thickness = 1.dp)
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -97,7 +91,7 @@ fun ExistingTicketScreen(navController: NavController) {
             // --- STATUS DO TICKET ---
             CustomBadge(
                 text = "Problema Encontrado",
-                backgroundColor = Color(0xFF4CAF50)
+                backgroundColor = Color(0xFF4CAF50) // Verde
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -119,7 +113,7 @@ fun ExistingTicketScreen(navController: NavController) {
                 onValueChange = { descricao = it },
                 singleLine = false,
                 minLines = 5,
-                readOnly = true
+                readOnly = true // Campo travado para edição
             )
 
             Spacer(modifier = Modifier.height(32.dp))
