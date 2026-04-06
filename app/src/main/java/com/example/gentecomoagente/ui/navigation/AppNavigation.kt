@@ -24,47 +24,47 @@ fun AppNavigation() {
     NavHost(navController = navController, startDestination = "chat_client_screen") {
 
         // Rota 1: Tela de Suporte
-        composable("support_screen") {
+        composable(Routes.SUPPORT) {
             HomeScreen(navController = navController)
         }
         // Rota 2: Tela de busca de ticket existente
-        composable("ticket_screen") {
+        composable(Routes.TICKET) {
             ExistingTicketScreen(navController = navController)
         }
         // Rota 3: Tela de chat de atendimento do cliente
-        composable("chat_client_screen") {
+        composable(Routes.CHAT_CLIENT) {
             ChatClientScreen(navController = navController)
         }
         //Rota 4: Tela de Login
-        composable("login_screen") {
+        composable(Routes.LOGIN) {
             LoginScreen(navController = navController)
         }
         //Rota 5: Tela inicial do agente
-        composable("tickets_agent_screen") {
+        composable(Routes.TICKETS_AGENT) {
             TicketsAgentScreen(navController = navController)
         }
 
         // Rota 6: Tela de chat de atendimento do cliente
-        composable("chat_agent_screen") {
+        composable(Routes.CHAT_AGENT) {
             AtendimentoScreen(navController = navController)
         }
         // Rota 7: Tela de Home do Gerente
-        composable("gerente_home_screen") {
+        composable(Routes.GERENTE_HOME) {
             GerenteHomeScreen(navController = navController)
         }
 
         // Rota 8: Tela de Tickets do Gerente
-        composable("gerente_ticket_screen") {
+        composable(Routes.GERENTE_TICKETS) {
             GerenteTicketScreen(navController = navController)
         }
 
         // Rota 9: Tela de Tipos de problema
-        composable("problem_type_screen") {
+        composable(Routes.PROBLEM_TYPE) {
             ProblemTypeScreen(navController = navController)
         }
 
         // Rota 10: Tela de cadastro de agente
-        composable("agent_creation_screen") {
+        composable(Routes.AGENT_CREATION) {
             AgentCreationScreen(navController = navController)
         }
     }
