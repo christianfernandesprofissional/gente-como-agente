@@ -4,15 +4,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -20,6 +19,7 @@ import androidx.navigation.NavController
 import com.example.gentecomoagente.model.ProblemTypeModel
 import com.example.gentecomoagente.ui.components.CustomButton
 import com.example.gentecomoagente.ui.components.CustomTextField
+import com.example.gentecomoagente.ui.components.CustomTopHeader
 import java.util.UUID
 
 @Composable
@@ -42,28 +42,12 @@ fun ProblemTypeScreen(navController: NavController) {
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // --- 2. CABEÇALHO ---
-        // Botão Voltar (Ícone + Texto, Retangular)
-        Button(
-            onClick = { navController.popBackStack() },
-            modifier = Modifier
-                .fillMaxWidth(0.4f)
-                .height(48.dp),
-            shape = RectangleShape,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFE0E0E0), // Cinza claro
-                contentColor = Color.Black
-            ),
-            contentPadding = PaddingValues(horizontal = 12.dp)
-        ) {
-            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Voltar")
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Voltar", fontWeight = FontWeight.Medium)
-        }
-
-        // Linhas divisórias
-        Divider(color = Color(0xFFEEEEEE), thickness = 1.dp)
-        Divider(color = Color(0xFF81D4FA), thickness = 1.dp)
+        // --- 2. CABEÇALHO (Refatorado com CustomTopHeader!) ---
+        CustomTopHeader(
+            buttonText = "Voltar",
+            buttonIcon = Icons.Default.ArrowBack,
+            onClickButton = { navController.popBackStack() }
+        )
 
         // Identificação do Gerente
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
@@ -78,7 +62,6 @@ fun ProblemTypeScreen(navController: NavController) {
         }
 
         // --- 3. LISTA DE TIPOS DE PROBLEMA ---
-        // O weight(1f) faz a lista empurrar o formulário lá para o final da tela!
         LazyColumn(
             modifier = Modifier
                 .weight(1f)
@@ -90,7 +73,6 @@ fun ProblemTypeScreen(navController: NavController) {
                 ProblemTypeCard(
                     problemType = type,
                     onDelete = {
-                        // Lógica real de exclusão da lista
                         problemTypes.remove(type)
                     }
                 )
@@ -130,7 +112,6 @@ fun ProblemTypeScreen(navController: NavController) {
                 text = "Cadastrar Tipo de Problema",
                 onClick = {
                     if (novoNome.isNotBlank() && novaDescricao.isNotBlank()) {
-                        // Adiciona na lista
                         problemTypes.add(
                             ProblemTypeModel(
                                 id = UUID.randomUUID().toString(),
@@ -138,7 +119,6 @@ fun ProblemTypeScreen(navController: NavController) {
                                 descricao = novaDescricao
                             )
                         )
-                        // Limpa os campos
                         novoNome = ""
                         novaDescricao = ""
                     }

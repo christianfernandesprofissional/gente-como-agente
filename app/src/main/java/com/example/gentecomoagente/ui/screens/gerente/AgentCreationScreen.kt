@@ -5,18 +5,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.gentecomoagente.ui.components.CustomButton
 import com.example.gentecomoagente.ui.components.CustomTextField
+import com.example.gentecomoagente.ui.components.CustomTopHeader
 
 
 @Composable
@@ -32,30 +31,12 @@ fun AgentCreationScreen(navController: NavController) {
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // --- 2. CABEÇALHO ---
-        Column(modifier = Modifier.padding(16.dp)) {
-            // Botão Voltar (Ícone + Texto, Retangular)
-            Button(
-                onClick = { navController.popBackStack() },
-                modifier = Modifier
-                    .fillMaxWidth(0.4f)
-                    .height(48.dp),
-                shape = RectangleShape,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFE0E0E0), // Cinza claro
-                    contentColor = Color.Black
-                ),
-                contentPadding = PaddingValues(horizontal = 12.dp)
-            ) {
-                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Voltar")
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Voltar")
-            }
-        }
-
-        // Linhas divisórias (Neutra e Azul Clara)
-        Divider(color = Color(0xFFEEEEEE), thickness = 1.dp)
-        Divider(color = Color(0xFF81D4FA), thickness = 1.dp)
+        // --- 2. CABEÇALHO (Refatorado com CustomTopHeader!) ---
+        CustomTopHeader(
+            buttonText = "Voltar",
+            buttonIcon = Icons.Default.ArrowBack,
+            onClickButton = { navController.popBackStack() }
+        )
 
         // --- 3. FORMULÁRIO CENTRALIZADO ---
         // A Box com weight(1f) ocupa todo o espaço restante da tela.
