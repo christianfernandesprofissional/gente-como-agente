@@ -19,16 +19,14 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.gentecomoagente.model.ChatMessage
 import com.example.gentecomoagente.ui.components.ChatMessageBubble
+import com.example.gentecomoagente.ui.components.CustomButton
 import com.example.gentecomoagente.ui.components.TypingIndicator
 import kotlinx.coroutines.launch
-
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AtendimentoScreen(navController: NavController) {
     var inputText by remember { mutableStateOf("") }
-
     val ticketNumber = "TKT-001234"
 
     val messages = remember {
@@ -55,7 +53,7 @@ fun AtendimentoScreen(navController: NavController) {
             .background(Color.White)
     ) {
 
-        // --- CABEÇALHO ---
+        // --- CABEÇALHO (Refatorado com CustomButton) ---
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -63,34 +61,23 @@ fun AtendimentoScreen(navController: NavController) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-
-            Button(
+            // Botão Voltar
+            CustomButton(
+                text = "Voltar",
+                icon = Icons.Default.ArrowBack,
                 onClick = { navController.popBackStack() },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFEEEEEE),
-                    contentColor = Color.Black
-                ),
-                shape = RoundedCornerShape(8.dp),
+                containerColor = Color(0xFFEEEEEE),
+                contentColor = Color.Black,
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Voltar"
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Voltar")
-            }
+            )
 
-            Button(
+            // Botão Encerrar Ticket
+            CustomButton(
+                text = "Encerrar Ticket",
                 onClick = { /* lógica para encerrar ticket */ },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFE57373),
-                    contentColor = Color.White
-                ),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text("Encerrar Ticket")
-            }
+                containerColor = Color(0xFFE57373), // Vermelho claro
+                contentColor = Color.White
+            )
         }
 
         Divider(color = Color(0xFF81D4FA), thickness = 1.dp)
@@ -123,7 +110,6 @@ fun AtendimentoScreen(navController: NavController) {
                     .padding(12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-
                 items(messages) { msg ->
                     ChatMessageBubble(message = msg)
                 }
@@ -141,7 +127,6 @@ fun AtendimentoScreen(navController: NavController) {
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             OutlinedTextField(
                 value = inputText,
                 onValueChange = { inputText = it },
@@ -161,7 +146,9 @@ fun AtendimentoScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Button(
+            // --- BOTÃO ENVIAR (Refatorado com CustomButton) ---
+            CustomButton(
+                text = "Enviar",
                 onClick = {
                     if (inputText.isNotBlank()) {
                         messages.add(
@@ -177,15 +164,10 @@ fun AtendimentoScreen(navController: NavController) {
                         }
                     }
                 },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4CAF50),
-                    contentColor = Color.White
-                ),
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.height(56.dp)
-            ) {
-                Text("Enviar")
-            }
+                containerColor = Color(0xFF4CAF50), // Verde
+                contentColor = Color.White,
+                modifier = Modifier.height(56.dp) // Mantém a altura igual a do campo de texto
+            )
         }
     }
 }

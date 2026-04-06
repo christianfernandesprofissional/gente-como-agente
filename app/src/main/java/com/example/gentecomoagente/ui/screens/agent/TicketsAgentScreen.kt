@@ -5,7 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -17,21 +18,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.gentecomoagente.model.TicketModel
+import com.example.gentecomoagente.ui.components.CustomButton
 
 
 @Composable
 fun TicketsAgentScreen(navController: NavController) {
-    // 1. DADOS FALSOS (Simulando o que viria de um Banco de Dados)
+    // 1. DADOS FALSOS
     val tickets = remember {
         listOf(
-            TicketModel(
-                "1",
-                "Gustavo",
-                "Suporte Técnico",
-                "Erro ao acessar o carrinho",
-                "Aberto",
-                "Conversar"
-            ),
+            TicketModel("1", "Gustavo", "Suporte Técnico", "Erro ao acessar o carrinho", "Aberto", "Conversar"),
             TicketModel("2", "Maria", "Financeiro", "Dúvida sobre estorno", "Em andamento", "Conversar"),
             TicketModel("3", "João", "Vendas", "Problema com cupom", "Fechado", "Visualizar"),
             TicketModel("4", "Ana", "Suporte Técnico", "Site fora do ar", "Aberto", "Conversar"),
@@ -45,25 +40,20 @@ fun TicketsAgentScreen(navController: NavController) {
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // --- 2. CABEÇALHO (Botão Sair) ---
-        // Repare que este botão NÃO tem padding, para ficar colado no topo/esquerda
-        Button(
-            onClick = { navController.popBackStack() }, // Ação de sair/voltar
+        // --- 2. CABEÇALHO (Refatorado com CustomButton) ---
+        CustomButton(
+            text = "Sair",
+            onClick = { navController.popBackStack() },
             modifier = Modifier
-                .fillMaxWidth(0.45f) // Ocupa 45% da largura da tela
+                .fillMaxWidth(0.45f)
                 .height(48.dp),
-            shape = RectangleShape, // Formato de bloco reto (sem cantos arredondados)
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFE0E0E0), // Cinza claro
-                contentColor = Color.Black
-            ),
-            elevation = ButtonDefaults.buttonElevation(0.dp)
-        ) {
-            Text("Sair", fontWeight = FontWeight.Medium)
-        }
+            shape = RectangleShape, // Formato de bloco reto
+            containerColor = Color(0xFFE0E0E0),
+            contentColor = Color.Black,
+            fontWeight = FontWeight.Medium
+        )
 
         // --- 3. CONTEÚDO COM PADDING LATERAL ---
-        // Tudo daqui para baixo terá margens laterais consistentes
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -91,18 +81,16 @@ fun TicketsAgentScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // --- 4. LISTA DE TICKETS (Rolável) ---
+            // --- 4. LISTA DE TICKETS ---
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = 16.dp), // Espaço no final da lista
-                verticalArrangement = Arrangement.spacedBy(16.dp) // Espaço entre os tickets
+                contentPadding = PaddingValues(bottom = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(tickets) { ticket ->
-                    // Chamamos o componente que desenha 1 ticket, passando os dados dele
                     TicketListItem(
                         ticket = ticket,
                         onActionClick = {
-                            // Aqui você colocaria a navegação para o chat, por exemplo
                             println("Clicou no ticket: ${ticket.id}")
                         }
                     )
@@ -117,7 +105,7 @@ fun TicketsAgentScreen(navController: NavController) {
 fun TicketListItem(ticket: TicketModel, onActionClick: () -> Unit) {
     Column(modifier = Modifier.fillMaxWidth()) {
 
-        // 1. Título do Ticket (Fora da caixa cinza)
+        // 1. Título do Ticket
         Text(
             text = "${ticket.nomeCliente} - ${ticket.setor}",
             fontSize = 16.sp,
@@ -129,8 +117,8 @@ fun TicketListItem(ticket: TicketModel, onActionClick: () -> Unit) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFF5F5F5)) // Fundo Cinza Claro
-                .padding(12.dp) // Padding interno da caixa
+                .background(Color(0xFFF5F5F5))
+                .padding(12.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
 
@@ -146,33 +134,32 @@ fun TicketListItem(ticket: TicketModel, onActionClick: () -> Unit) {
                 // Linha 2: Atendimento + Botão Verde
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween, // Empurra o texto pra esquerda e o botão pra direita
-                    verticalAlignment = Alignment.Bottom // Alinha pelo fundo
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Bottom
                 ) {
                     Text(
                         text = "Atendimento: ${ticket.statusAtendimento}",
                         fontSize = 14.sp,
                         color = Color.Black,
-                        modifier = Modifier.weight(1f) // Evita que o texto empurre o botão para fora da tela se for muito grande
+                        modifier = Modifier.weight(1f)
                     )
 
                     Spacer(modifier = Modifier.width(8.dp))
 
-                    // Botão de Ação (Verde)
-                    Button(
+                    // Botão de Ação (Refatorado com CustomButton)
+                    CustomButton(
+                        text = ticket.textoBotaoAcao,
                         onClick = onActionClick,
                         modifier = Modifier.height(36.dp), // Botão menorzinho
-                        shape = RoundedCornerShape(4.dp), // Levemente arredondado conforme especificação
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF4CAF50), // Verde vivo
-                            contentColor = Color.White
-                        ),
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp)
-                    ) {
-                        Text(text = ticket.textoBotaoAcao, fontSize = 12.sp)
-                    }
+                        shape = RoundedCornerShape(4.dp), // Levemente arredondado
+                        containerColor = Color(0xFF4CAF50), // Verde vivo
+                        contentColor = Color.White,
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                        fontSize = 12.sp
+                    )
                 }
             }
         }
     }
 }
+
