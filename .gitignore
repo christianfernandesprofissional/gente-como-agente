@@ -33,3 +33,4 @@ captures/
 # Security
 *.jks
 *.keystore
+google-services.json
