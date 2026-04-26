@@ -26,11 +26,41 @@ fun GerenteHomeScreen(navController: NavController) {
     // 1. DADOS FALSOS
     val agentes = remember {
         listOf(
-            AgentModel("Gustavo", "gustavo.suporte@empresa.com", "Suporte Técnico", true),
-            AgentModel("Maria", "maria.vendas@empresa.com", "Vendas", true),
-            AgentModel("João", "joao.cobranca@empresa.com", "Cobranças", true),
-            AgentModel("Ana", "ana.credito@empresa.com", "Análise de Crédito", true),
-            AgentModel("Carlos", "carlos.suporte@empresa.com", "Suporte Técnico", false)
+            AgentModel(
+                id = "1",
+                username = "Gustavo",
+                email = "gustavo.suporte@empresa.com",
+                role = "agent",
+                isActive = true
+            ),
+            AgentModel(
+                id = "2",
+                username = "Maria",
+                email = "maria.vendas@empresa.com",
+                role = "agent",
+                isActive = true
+            ),
+            AgentModel(
+                id = "3",
+                username = "João",
+                email = "joao.cobranca@empresa.com",
+                role = "agent",
+                isActive = true
+            ),
+            AgentModel(
+                id = "4",
+                username = "Ana",
+                email = "ana.credito@empresa.com",
+                role = "agent",
+                isActive = true
+            ),
+            AgentModel(
+                id = "5",
+                username = "Carlos",
+                email = "carlos.suporte@empresa.com",
+                role = "agent",
+                isActive = false
+            )
         )
     }
 
