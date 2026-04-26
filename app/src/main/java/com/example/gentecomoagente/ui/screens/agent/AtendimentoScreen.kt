@@ -32,12 +32,14 @@ fun AtendimentoScreen(navController: NavController) {
     val messages = remember {
         mutableStateListOf(
             ChatMessage(
-                "Olá, Gustavo. Tudo bem? Vou te ajudar com o seu problema de acesso.",
-                isFromClient = false
+                senderId = "agent_1",
+                senderType = "AGENT",
+                content = "Olá, Gustavo. Tudo bem? Vou te ajudar com o seu problema de acesso."
             ),
             ChatMessage(
-                "Estou com um problema ao acessar o site de vendas. Toda vez que clico em 'carrinho' a página atualiza e eu perco os produtos selecionados.",
-                isFromClient = true
+                senderId = "client_1",
+                senderType = "CLIENT",
+                content = "Estou com um problema ao acessar o site de vendas..."
             )
         )
     }
@@ -153,8 +155,9 @@ fun AtendimentoScreen(navController: NavController) {
                     if (inputText.isNotBlank()) {
                         messages.add(
                             ChatMessage(
-                                text = inputText,
-                                isFromClient = true
+                                senderId = "agent_1",
+                                senderType = "AGENT",
+                                content = inputText
                             )
                         )
                         inputText = ""
@@ -164,9 +167,9 @@ fun AtendimentoScreen(navController: NavController) {
                         }
                     }
                 },
-                containerColor = Color(0xFF4CAF50), // Verde
+                containerColor = Color(0xFF4CAF50),
                 contentColor = Color.White,
-                modifier = Modifier.height(56.dp) // Mantém a altura igual a do campo de texto
+                modifier = Modifier.height(56.dp)
             )
         }
     }

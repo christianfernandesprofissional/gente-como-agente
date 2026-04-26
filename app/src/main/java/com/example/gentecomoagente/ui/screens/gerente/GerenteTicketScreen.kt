@@ -25,10 +25,34 @@ fun GerenteTicketScreen(navController: NavController) {
     // 1. DADOS FALSOS
     val tickets = remember {
         listOf(
-            TicketModel("1", "", "", "Área do carrinho com problema", "Em andamento", "Visualizar"),
-            TicketModel("2", "", "", "Dúvida sobre estorno", "Não iniciado", "Conversar"),
-            TicketModel("3", "", "", "Site fora do ar", "Finalizado", "Visualizar"),
-            TicketModel("4", "", "", "Erro ao aplicar cupom", "Não iniciado", "Conversar")
+            TicketModel(
+                customerName = "Gustavo",
+                customerEmail = "gustavo@email.com",
+                problemType = "Carrinho com problema",
+                status = "IN_PROGRESS",
+                accessCode = "123456"
+            ),
+            TicketModel(
+                customerName = "Maria",
+                customerEmail = "maria@email.com",
+                problemType = "Dúvida sobre estorno",
+                status = "OPEN",
+                accessCode = "654321"
+            ),
+            TicketModel(
+                customerName = "João",
+                customerEmail = "joao@email.com",
+                problemType = "Site fora do ar",
+                status = "CLOSED",
+                accessCode = "999999"
+            ),
+            TicketModel(
+                customerName = "Ana",
+                customerEmail = "ana@email.com",
+                problemType = "Erro ao aplicar cupom",
+                status = "OPEN",
+                accessCode = "777777"
+            )
         )
     }
 
@@ -79,6 +103,16 @@ fun GerenteTicketScreen(navController: NavController) {
 // --- COMPONENTE: CARD DO TICKET ---
 @Composable
 fun GerenteTicketCard(ticket: TicketModel) {
+
+    val statusText = when (ticket.status) {
+        "OPEN" -> "Não iniciado"
+        "IN_PROGRESS" -> "Em andamento"
+        "CLOSED" -> "Finalizado"
+        else -> ticket.status
+    }
+
+    val buttonText = if (ticket.status == "CLOSED") "Visualizar" else "Conversar"
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -87,9 +121,9 @@ fun GerenteTicketCard(ticket: TicketModel) {
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
 
-            // Problema
+            // 🔹 Problema (agora é problemType)
             Text(
-                text = "Problema: ${ticket.problema}",
+                text = "Problema: ${ticket.problemType}",
                 fontSize = 15.sp,
                 color = Color.Black,
                 fontWeight = FontWeight.Medium
@@ -97,15 +131,15 @@ fun GerenteTicketCard(ticket: TicketModel) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Linha inferior: Status + Botão
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Bottom
             ) {
-                // Status
+
+                // 🔹 Status
                 Text(
-                    text = "Atendimento: ${ticket.statusAtendimento}",
+                    text = "Atendimento: $statusText",
                     fontSize = 14.sp,
                     color = Color.DarkGray,
                     modifier = Modifier.weight(1f)
@@ -113,14 +147,14 @@ fun GerenteTicketCard(ticket: TicketModel) {
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                // Botão de Ação (Já estava usando o CustomButton corretamente!)
+                // 🔹 Botão dinâmico
                 CustomButton(
-                    text = ticket.textoBotaoAcao,
-                    onClick = { /* Ação baseada no status */ },
-                    containerColor = Color(0xFF4CAF50), // Verde
+                    text = buttonText,
+                    onClick = { /* ação depois */ },
+                    containerColor = Color(0xFF4CAF50),
                     contentColor = Color.White,
                     shape = RoundedCornerShape(6.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp),
                     modifier = Modifier.height(36.dp)
                 )
             }

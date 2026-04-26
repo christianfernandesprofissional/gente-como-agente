@@ -26,11 +26,11 @@ fun GerenteHomeScreen(navController: NavController) {
     // 1. DADOS FALSOS
     val agentes = remember {
         listOf(
-            AgentModel("1", "Gustavo", "gustavo.suporte@empresa.com", "Suporte Técnico"),
-            AgentModel("2", "Maria", "maria.vendas@empresa.com", "Vendas"),
-            AgentModel("3", "João", "joao.cobranca@empresa.com", "Cobranças"),
-            AgentModel("4", "Ana", "ana.credito@empresa.com", "Análise de Crédito"),
-            AgentModel("5", "Carlos", "carlos.suporte@empresa.com", "Suporte Técnico")
+            AgentModel("Gustavo", "gustavo.suporte@empresa.com", "Suporte Técnico", true),
+            AgentModel("Maria", "maria.vendas@empresa.com", "Vendas", true),
+            AgentModel("João", "joao.cobranca@empresa.com", "Cobranças", true),
+            AgentModel("Ana", "ana.credito@empresa.com", "Análise de Crédito", true),
+            AgentModel("Carlos", "carlos.suporte@empresa.com", "Suporte Técnico", false)
         )
     }
 
@@ -120,6 +120,9 @@ fun GerenteHomeScreen(navController: NavController) {
 // --- COMPONENTE: CARD DO AGENTE ---
 @Composable
 fun AgentListItem(agente: AgentModel) {
+
+    val statusText = if (agente.isActive) "Ativo" else "Inativo"
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -131,37 +134,51 @@ fun AgentListItem(agente: AgentModel) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // LADO ESQUERDO: Informações
+
+            // 🔹 LADO ESQUERDO
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = agente.nome, fontSize = 16.sp, color = Color.Black)
+
+                Text(
+                    text = agente.username,
+                    fontSize = 16.sp,
+                    color = Color.Black
+                )
+
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = agente.email, fontSize = 14.sp, color = Color.Black)
+
+                Text(
+                    text = agente.email,
+                    fontSize = 14.sp,
+                    color = Color.Black
+                )
             }
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            // LADO DIREITO: Botões de Ação (Refatorados com CustomButton)
+            // 🔹 LADO DIREITO
             Column(horizontalAlignment = Alignment.End) {
-                // Linha superior: Editar e Excluir
+
+                // Linha superior
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+
                     CustomButton(
                         text = "Editar",
-                        onClick = { /* Ação */ },
-                        containerColor = Color(0xFF1976D2), // Azul
+                        onClick = { /* TODO */ },
+                        containerColor = Color(0xFF1976D2),
                         contentColor = Color.White,
                         fontSize = 11.sp,
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
+                        contentPadding = PaddingValues(horizontal = 8.dp),
                         elevation = 2.dp,
                         shape = RoundedCornerShape(4.dp)
                     )
 
                     CustomButton(
                         text = "Excluir",
-                        onClick = { /* Ação */ },
-                        containerColor = Color(0xFFD32F2F), // Vermelho
+                        onClick = { /* TODO */ },
+                        containerColor = Color(0xFFD32F2F),
                         contentColor = Color.White,
                         fontSize = 11.sp,
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
+                        contentPadding = PaddingValues(horizontal = 8.dp),
                         elevation = 2.dp,
                         shape = RoundedCornerShape(4.dp)
                     )
@@ -169,20 +186,28 @@ fun AgentListItem(agente: AgentModel) {
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // Linha inferior: Setor
+                // 🔹 Role (substitui "setor")
                 CustomButton(
-                    text = agente.setor,
-                    onClick = { /* Ação */ },
-                    modifier = Modifier.fillMaxWidth(0.4f),
-                    containerColor = Color(0xFF388E3C), // Verde
+                    text = agente.role,
+                    onClick = { /* opcional */ },
+                    modifier = Modifier.fillMaxWidth(0.5f),
+                    containerColor = Color(0xFF388E3C),
                     contentColor = Color.White,
                     fontSize = 11.sp,
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp),
                     elevation = 2.dp,
                     shape = RoundedCornerShape(4.dp)
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // 🔹 Status
+                Text(
+                    text = statusText,
+                    fontSize = 12.sp,
+                    color = if (agente.isActive) Color(0xFF2E7D32) else Color.Red
                 )
             }
         }
     }
 }
-

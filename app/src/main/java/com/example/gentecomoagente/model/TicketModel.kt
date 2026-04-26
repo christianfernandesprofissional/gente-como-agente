@@ -1,10 +1,20 @@
 package com.example.gentecomoagente.model
 
+import com.google.firebase.Timestamp
+
 data class TicketModel(
-    val id: String,
-    val nomeCliente: String,
-    val setor: String,
-    val problema: String,
-    val statusAtendimento: String,
-    val textoBotaoAcao: String // "Conversar" ou "Visualizar"
+    val customerName: String = "",
+    val customerEmail: String = "",
+
+    val problemType: String = "", // 👈 agora é só String
+
+    val status: String = "OPEN",
+    val createdAt: Timestamp? = null,
+
+    val assignedAgentId: String? = null,
+
+    val lastMessage: String = "",
+    val lastMessageAt: Timestamp? = null,
+
+    val accessCode: String = ""
 )
