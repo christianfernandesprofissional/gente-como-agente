@@ -230,12 +230,17 @@ fun AgentCreationScreen(navController: NavController) {
 
                                 isLoading = false
 
+                                // 🔥 limpa campos
+                                nome = ""
+                                email = ""
+                                senha = ""
+                                selectedRole = "agent"
+
+                                // 🔥 toast sucesso
                                 showToast(
                                     context,
                                     "Agente criado com sucesso"
                                 )
-
-                                navController.popBackStack()
                             },
 
                             onError = { error ->
