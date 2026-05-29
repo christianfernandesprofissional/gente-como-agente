@@ -11,6 +11,8 @@ class AgentService(
     private val db = FirebaseFirestore.getInstance()
 
     fun createAgent(
+        adminEmail: String,
+        adminPassword: String,
         email: String,
         password: String,
         agent: AgentModel,
@@ -18,40 +20,61 @@ class AgentService(
         onError: (String) -> Unit
     ) {
 
-        // 🔥 valida domínio
         if (!email.endsWith("@gentecomoagente.com")) {
-            onError("O email deve terminar com @gentecomoagente.com")
+
+            onError(
+                "O email deve terminar com @gentecomoagente.com"
+            )
+
             return
         }
 
-        // 🔥 valida senha
         if (password.length < 8) {
-            onError("A senha deve ter no mínimo 8 caracteres")
+
+            onError(
+                "A senha deve ter no mínimo 8 caracteres"
+            )
+
             return
         }
 
-        // 🔥 verifica se email já existe
         db.collection("users")
             .whereEqualTo("email", email)
             .get()
+
             .addOnSuccessListener { result ->
 
                 if (!result.isEmpty) {
-                    onError("Este email já está cadastrado")
+
+                    onError(
+                        "Este email já está cadastrado"
+                    )
+
                     return@addOnSuccessListener
                 }
 
-                // 🔥 chama repository
                 repository.createAgent(
+                    adminEmail = adminEmail,
+
+                    adminPassword = adminPassword,
+
                     email = email,
+
                     password = password,
+
                     agent = agent,
+
                     onSuccess = onSuccess,
+
                     onError = onError
                 )
             }
+
             .addOnFailureListener { e ->
-                onError(e.message ?: "Erro ao validar email")
+
+                onError(
+                    e.message ?: "Erro ao validar email"
+                )
             }
     }
 
