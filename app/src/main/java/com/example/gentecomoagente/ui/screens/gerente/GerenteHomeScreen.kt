@@ -204,7 +204,8 @@ fun GerenteHomeScreen(navController: NavController) {
                     items(agentes) { agente ->
 
                         AgentListItem(
-                            agente = agente
+                            agente = agente,
+                            navController
                         )
                     }
                 }
@@ -216,7 +217,8 @@ fun GerenteHomeScreen(navController: NavController) {
 // --- CARD DO AGENTE ---
 @Composable
 fun AgentListItem(
-    agente: AgentModel
+    agente: AgentModel,
+    navController: NavController
 ) {
 
     val statusText =
@@ -269,7 +271,7 @@ fun AgentListItem(
 
                     CustomButton(
                         text = "Editar",
-                        onClick = { },
+                        onClick = { navController.navigate("${Routes.AGENT_EDIT}/${agente.id}") },
                         containerColor = Color(0xFF1976D2),
                         contentColor = Color.White,
                         fontSize = 11.sp,
