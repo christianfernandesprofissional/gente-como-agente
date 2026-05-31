@@ -16,6 +16,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.gentecomoagente.model.ProblemTypeModel
+import com.example.gentecomoagente.repository.ProblemTypeRepository
 import com.example.gentecomoagente.ui.components.CustomButton
 import com.example.gentecomoagente.ui.components.CustomDropdown
 import com.example.gentecomoagente.ui.components.CustomTextField
@@ -24,13 +26,30 @@ import com.example.gentecomoagente.ui.navigation.Routes
 
 @Composable
 fun HomeScreen(navController: NavController) {
+    val repository = remember { ProblemTypeRepository() }
+    
     // ESTADOS
     var nome by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var descricao by remember { mutableStateOf("") }
 
-    val opcoesProblema = listOf("Análise de Crédito", "Problema Técnico", "Dúvida Financeira")
-    var problemaSelecionado by remember { mutableStateOf(opcoesProblema[0]) }
+    var problemTypes by remember { mutableStateOf<List<ProblemTypeModel>>(emptyList()) }
+    var problemaSelecionado by remember { mutableStateOf("") }
+
+    // Carregar tipos de problema do Firestore
+    LaunchedEffect(Unit) {
+        repository.findAll(
+            onSuccess = { list ->
+                problemTypes = list
+                if (list.isNotEmpty()) {
+                    problemaSelecionado = list[0].name
+                }
+            },
+            onError = { /* Tratar erro se necessário */ }
+        )
+    }
+
+    val opcoesProblema = problemTypes.map { it.name }
 
     // Container Principal
     Box(
