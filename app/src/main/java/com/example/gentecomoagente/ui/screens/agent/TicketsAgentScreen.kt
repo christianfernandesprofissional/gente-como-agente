@@ -18,12 +18,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.gentecomoagente.model.TicketModel
+import com.example.gentecomoagente.repository.AuthRepository
 import com.example.gentecomoagente.ui.components.CustomButton
 import com.example.gentecomoagente.ui.navigation.Routes
 
 
 @Composable
 fun TicketsAgentScreen(navController: NavController) {
+
+    val authRepository = remember {
+        AuthRepository()
+    }
     // 1. DADOS FALSOS
     val tickets = remember {
         listOf(
@@ -60,7 +65,15 @@ fun TicketsAgentScreen(navController: NavController) {
         // --- 2. CABEÇALHO (Refatorado com CustomButton) ---
         CustomButton(
             text = "Sair",
-            onClick = { navController.popBackStack() },
+            onClick = {
+                authRepository.logout()
+
+                navController.navigate(Routes.TELA_INICIAL) {
+
+                    popUpTo(0)
+                }
+
+            },
             modifier = Modifier
                 .fillMaxWidth(0.45f)
                 .height(48.dp),

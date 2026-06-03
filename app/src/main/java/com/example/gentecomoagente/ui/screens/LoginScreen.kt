@@ -30,7 +30,7 @@ fun LoginScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    val authRepository = remember { AuthRepository() }
+    val authRepository = remember { AuthRepository(context) }
     val agentRepository = remember { AgentRepository() }
 
     var isLoading by remember { mutableStateOf(false) }
@@ -44,7 +44,9 @@ fun LoginScreen(navController: NavController) {
         CustomTopHeader(
             buttonText = "Voltar",
             buttonIcon = Icons.Default.ArrowBack,
-            onClickButton = { navController.popBackStack() }
+            onClickButton = {
+                navController.popBackStack()
+            }
         )
 
         Box(
@@ -59,30 +61,54 @@ fun LoginScreen(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
+                // 🔥 EMAIL
                 CustomTextField(
                     label = "Email",
                     value = email,
-                    onValueChange = { email = it }
+                    onValueChange = {
+                        email = it
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Email
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                // 🔥 SENHA
                 CustomTextField(
                     label = "Senha",
                     value = password,
-                    onValueChange = { password = it },
+                    onValueChange = {
+                        password = it
+                    },
                     visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(40.dp))
 
+                // 🔥 BOTÃO LOGIN
                 CustomButton(
-                    text = if (isLoading) "Entrando..." else "Entrar",
+                    text = if (isLoading)
+                        "Entrando..."
+                    else
+                        "Entrar",
+
                     onClick = {
 
-                        if (email.isBlank() || password.isBlank()) {
-                            showToast(context, "Preencha todos os campos")
+                        if (
+                            email.isBlank() ||
+                            password.isBlank()
+                        ) {
+
+                            showToast(
+                                context,
+                                "Preencha todos os campos"
+                            )
+
                             return@CustomButton
                         }
 
@@ -91,64 +117,123 @@ fun LoginScreen(navController: NavController) {
                         authRepository.login(
                             email = email.trim(),
                             password = password,
+
                             onSuccess = {
+
+                                // 🔥 salva credenciais do admin
+                                authRepository.saveAdminCredentials(
+                                    email.trim(),
+                                    password
+                                )
 
                                 val uid = authRepository.getCurrentUserId()
 
                                 if (uid == null) {
+
                                     isLoading = false
-                                    showToast(context, "Erro ao obter usuário")
+
+                                    showToast(
+                                        context,
+                                        "Erro ao obter usuário"
+                                    )
+
                                     return@login
                                 }
 
                                 agentRepository.getAgentById(
                                     uid = uid,
+
                                     onSuccess = { agent ->
 
                                         isLoading = false
 
+                                        // 🔥 usuário não encontrado
                                         if (agent == null) {
-                                            showToast(context, "Usuário não encontrado")
+
+                                            authRepository.logout()
+
+                                            showToast(
+                                                context,
+                                                "Usuário não encontrado"
+                                            )
+
                                             return@getAgentById
                                         }
 
+                                        // 🔥 usuário inativo
                                         if (!agent.isActive) {
-                                            showToast(context, "Usuário inativo")
+
+                                            authRepository.logout()
+
+                                            showToast(
+                                                context,
+                                                "Usuário inativo"
+                                            )
+
                                             return@getAgentById
                                         }
 
+                                        // 🔥 navegação por role
                                         when (agent.role.lowercase()) {
 
                                             "admin" -> {
-                                                navController.navigate(Routes.GERENTE_HOME) {
+
+                                                navController.navigate(
+                                                    Routes.GERENTE_HOME
+                                                ) {
                                                     popUpTo(0)
                                                 }
                                             }
 
                                             "agent" -> {
-                                                navController.navigate(Routes.TICKETS_AGENT) {
+
+                                                navController.navigate(
+                                                    Routes.TICKETS_AGENT
+                                                ) {
                                                     popUpTo(0)
                                                 }
                                             }
 
                                             else -> {
-                                                showToast(context, "Permissão inválida")
+
+                                                authRepository.logout()
+
+                                                showToast(
+                                                    context,
+                                                    "Permissão inválida"
+                                                )
                                             }
                                         }
                                     },
+
                                     onError = {
+
                                         isLoading = false
-                                        showToast(context, "Erro ao buscar usuário")
+
+                                        authRepository.logout()
+
+                                        showToast(
+                                            context,
+                                            "Erro ao buscar usuário"
+                                        )
                                     }
                                 )
                             },
+
                             onError = {
+
                                 isLoading = false
-                                showToast(context, "Email ou senha inválidos")
+
+                                showToast(
+                                    context,
+                                    "Email ou senha inválidos"
+                                )
                             }
                         )
                     },
+
                     modifier = Modifier.fillMaxWidth(0.6f),
+
                     containerColor = Color(0xFFBDBDBD)
                 )
             }

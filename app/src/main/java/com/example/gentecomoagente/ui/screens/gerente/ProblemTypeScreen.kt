@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.gentecomoagente.model.ProblemTypeModel
+import com.example.gentecomoagente.repository.ProblemTypeRepository
 import com.example.gentecomoagente.ui.components.CustomButton
 import com.example.gentecomoagente.ui.components.CustomTextField
 import com.example.gentecomoagente.ui.components.CustomTopHeader
@@ -24,17 +25,24 @@ import java.util.UUID
 
 @Composable
 fun ProblemTypeScreen(navController: NavController) {
+    val repository = remember { ProblemTypeRepository() }
+    
     // 1. ESTADOS (Lista dinâmica e campos de texto)
-    val problemTypes = remember {
-        mutableStateListOf(
-            ProblemTypeModel("1", "Suporte Técnico", "Resolução de falhas e auxílio tecnológico"),
-            ProblemTypeModel("2", "Vendas", "Conversão de leads e novos pedidos"),
-            ProblemTypeModel("3", "Cobranças", "Negociação de débitos e faturas pendentes")
-        )
-    }
+    val problemTypes = remember { mutableStateListOf<ProblemTypeModel>() }
 
     var novoNome by remember { mutableStateOf("") }
     var novaDescricao by remember { mutableStateOf("") }
+
+    // Carregar dados iniciais do Firestore
+    LaunchedEffect(Unit) {
+        repository.findAll(
+            onSuccess = { list ->
+                problemTypes.clear()
+                problemTypes.addAll(list)
+            },
+            onError = { /* Tratar erro se necessário */ }
+        )
+    }
 
     // Container Principal (Fundo Branco)
     Column(
@@ -73,7 +81,11 @@ fun ProblemTypeScreen(navController: NavController) {
                 ProblemTypeCard(
                     problemType = type,
                     onDelete = {
-                        problemTypes.remove(type)
+                        repository.delete(
+                            id = type.id,
+                            onSuccess = { problemTypes.remove(type) },
+                            onError = { /* Tratar erro */ }
+                        )
                     }
                 )
             }
@@ -112,15 +124,27 @@ fun ProblemTypeScreen(navController: NavController) {
                 text = "Cadastrar Tipo de Problema",
                 onClick = {
                     if (novoNome.isNotBlank() && novaDescricao.isNotBlank()) {
-                        problemTypes.add(
-                            ProblemTypeModel(
-                                id = UUID.randomUUID().toString(),
-                                nome = novoNome,
-                                descricao = novaDescricao
-                            )
+                        val novoTipo = ProblemTypeModel(
+                            name = novoNome,
+                            description = novaDescricao
                         )
-                        novoNome = ""
-                        novaDescricao = ""
+                        
+                        repository.create(
+                            problemType = novoTipo,
+                            onSuccess = {
+                                // Recarrega a lista para pegar o ID gerado ou simplesmente limpa campos
+                                repository.findAll(
+                                    onSuccess = { list ->
+                                        problemTypes.clear()
+                                        problemTypes.addAll(list)
+                                    },
+                                    onError = {}
+                                )
+                                novoNome = ""
+                                novaDescricao = ""
+                            },
+                            onError = { /* Tratar erro */ }
+                        )
                     }
                 },
                 containerColor = Color(0xFFBDBDBD), // Cinza médio
@@ -148,14 +172,14 @@ fun ProblemTypeCard(problemType: ProblemTypeModel, onDelete: () -> Unit) {
             // LADO ESQUERDO: Textos
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = problemType.nome,
+                    text = problemType.name,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color.Black
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = problemType.descricao,
+                    text = problemType.description,
                     fontSize = 14.sp,
                     color = Color.DarkGray
                 )
@@ -163,18 +187,8 @@ fun ProblemTypeCard(problemType: ProblemTypeModel, onDelete: () -> Unit) {
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            // LADO DIREITO: Botões Editar e Excluir
+            // LADO DIREITO: Botão Excluir
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                CustomButton(
-                    text = "Editar",
-                    onClick = { /* Lógica de edição */ },
-                    containerColor = Color(0xFF1976D2), // Azul
-                    contentColor = Color.White,
-                    fontSize = 12.sp,
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
-                    modifier = Modifier.heightIn(min = 32.dp)
-                )
-
                 CustomButton(
                     text = "Excluir",
                     onClick = onDelete, // Chama a função que remove da lista

@@ -1,10 +1,20 @@
 package com.example.gentecomoagente.repository
 
+import android.content.Context
 import com.google.firebase.auth.FirebaseAuth
 
-class AuthRepository {
+class AuthRepository(
+    private val context: Context? = null
+) {
 
     private val auth = FirebaseAuth.getInstance()
+
+    // 🔥 SharedPreferences
+    private val prefs =
+        context?.getSharedPreferences(
+            "auth_prefs",
+            Context.MODE_PRIVATE
+        )
 
     // 🔐 LOGIN
     fun login(
@@ -13,46 +23,97 @@ class AuthRepository {
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
+
         auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    onSuccess()
-                } else {
-                    onError(task.exception?.message ?: "Erro ao fazer login")
-                }
+            .addOnSuccessListener {
+                onSuccess()
+            }
+            .addOnFailureListener { e ->
+                onError(
+                    e.message ?: "Erro ao fazer login"
+                )
             }
     }
 
-    // 🆕 CRIAR USUÁRIO (AUTH)
+    // 🆕 REGISTER
     fun register(
         email: String,
         password: String,
-        onSuccess: (String) -> Unit, // 🔥 retorna UID
+        onSuccess: (String) -> Unit,
         onError: (String) -> Unit
     ) {
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val uid = auth.currentUser?.uid
 
-                    if (uid != null) {
-                        onSuccess(uid) // 🔥 ESSENCIAL
-                    } else {
-                        onError("Erro ao obter UID do usuário")
-                    }
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnSuccessListener { result ->
+
+                val uid = result.user?.uid
+
+                if (uid != null) {
+
+                    onSuccess(uid)
+
                 } else {
-                    onError(task.exception?.message ?: "Erro ao criar usuário")
+
+                    onError("Erro ao obter UID do usuário")
                 }
+            }
+            .addOnFailureListener { e ->
+
+                onError(
+                    e.message ?: "Erro ao criar usuário"
+                )
             }
     }
 
     // 🚪 LOGOUT
     fun logout() {
+        clearAdminCredentials()
         auth.signOut()
     }
 
-    // 👤 USER ATUAL
+    // 👤 UID ATUAL
     fun getCurrentUserId(): String? {
         return auth.currentUser?.uid
+    }
+
+    // 👤 EMAIL ATUAL
+    fun getCurrentUserEmail(): String? {
+        return auth.currentUser?.email
+    }
+
+    // 🔥 VERIFICA LOGIN
+    fun isUserLogged(): Boolean {
+        return auth.currentUser != null
+    }
+
+    // =========================================
+    // 🔥 ADMIN CREDENTIALS
+    // =========================================
+
+    fun saveAdminCredentials(
+        email: String,
+        password: String
+    ) {
+
+        prefs?.edit()
+            ?.putString("admin_email", email)
+            ?.putString("admin_password", password)
+            ?.apply()
+    }
+
+    fun getAdminEmail(): String? {
+        return prefs?.getString("admin_email", null)
+    }
+
+    fun getAdminPassword(): String? {
+        return prefs?.getString("admin_password", null)
+    }
+
+    fun clearAdminCredentials() {
+
+        prefs?.edit()
+            ?.remove("admin_email")
+            ?.remove("admin_password")
+            ?.apply()
     }
 }

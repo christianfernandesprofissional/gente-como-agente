@@ -11,6 +11,7 @@ import com.example.gentecomoagente.ui.screens.agent.TicketsAgentScreen
 import com.example.gentecomoagente.ui.screens.client.ChatClientScreen
 import com.example.gentecomoagente.ui.screens.client.ExistingTicketScreen
 import com.example.gentecomoagente.ui.screens.gerente.AgentCreationScreen
+import com.example.gentecomoagente.ui.screens.gerente.AgentEditScreen
 import com.example.gentecomoagente.ui.screens.gerente.GerenteHomeScreen
 import com.example.gentecomoagente.ui.screens.gerente.GerenteTicketScreen
 import com.example.gentecomoagente.ui.screens.gerente.ProblemTypeScreen
@@ -66,6 +67,22 @@ fun AppNavigation() {
         // Rota 10: Tela de cadastro de agente
         composable(Routes.AGENT_CREATION) {
             AgentCreationScreen(navController = navController)
+        }
+
+        // Rota 11: Tela de edição de agente
+        composable(
+            route = "${Routes.AGENT_EDIT}/{agentId}"
+        ) { backStackEntry ->
+
+            val agentId =
+                backStackEntry.arguments
+                    ?.getString("agentId")
+                    ?: ""
+
+            AgentEditScreen(
+                navController = navController,
+                agentId = agentId
+            )
         }
     }
 }
