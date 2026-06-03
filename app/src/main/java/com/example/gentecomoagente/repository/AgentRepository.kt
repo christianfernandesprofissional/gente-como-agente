@@ -70,6 +70,7 @@ class AgentRepository(
     fun updateAgent(
         uid: String,
         username: String,
+        role: String,
         isActive: Boolean,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
@@ -77,16 +78,15 @@ class AgentRepository(
 
         val updates = mapOf(
             "username" to username,
+            "role" to role,
             "isActive" to isActive
         )
 
         collection.document(uid)
             .update(updates)
-
             .addOnSuccessListener {
                 onSuccess()
             }
-
             .addOnFailureListener { e ->
                 onError(
                     e.message ?: "Erro ao atualizar agente"

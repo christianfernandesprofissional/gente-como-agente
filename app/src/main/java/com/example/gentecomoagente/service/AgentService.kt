@@ -81,19 +81,23 @@ class AgentService(
     fun updateAgent(
         uid: String,
         username: String,
+        role: String,
         isActive: Boolean,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
 
         if (username.isBlank()) {
+
             onError("Username inválido")
+
             return
         }
 
         repository.updateAgent(
             uid = uid,
             username = username,
+            role = role,
             isActive = isActive,
             onSuccess = onSuccess,
             onError = onError

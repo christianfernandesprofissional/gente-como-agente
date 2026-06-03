@@ -322,32 +322,34 @@ fun AgentEditScreen(
 
                         isLoading = true
 
-                        val updatedAgent = AgentModel(
-                            id = agentId,
-                            username = nome.trim(),
-                            email = email,
-                            role = selectedRole,
-                            isActive = isActive
-                        )
-
-                        /*
                         agentService.updateAgent(
-                            agentId = agentId,
-                            agent = updatedAgent,
+                            uid = agentId,
+
+                            username = nome.trim(),
+
+                            role = selectedRole,
+
+                            isActive = isActive,
+
                             onSuccess = {
 
+                                isLoading = false
+
+                                showToast(
+                                    context,
+                                    "Agente atualizado com sucesso"
+                                )
                             },
-                            onError = {
 
+                            onError = { error ->
+
+                                isLoading = false
+
+                                showToast(
+                                    context,
+                                    error
+                                )
                             }
-                        )
-                        */
-
-                        isLoading = false
-
-                        showToast(
-                            context,
-                            "Agente atualizado com sucesso"
                         )
                     },
 
