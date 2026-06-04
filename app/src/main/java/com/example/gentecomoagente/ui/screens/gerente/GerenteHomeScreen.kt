@@ -21,12 +21,45 @@ import com.example.gentecomoagente.service.AgentService
 import com.example.gentecomoagente.ui.components.CustomButton
 import com.example.gentecomoagente.ui.navigation.Routes
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GerenteHomeScreen(navController: NavController) {
+
+    var filtroStatus by remember {
+        mutableStateOf("Todos")
+    }
+
+    var expandedFiltro by remember {
+        mutableStateOf(false)
+    }
+
+    val statusOptions = listOf(
+        "Todos",
+        "Ordem alfabética",
+        "Ativos",
+        "Inativos"
+    )
 
     val agentService = remember { AgentService() }
 
     var agentes by remember { mutableStateOf<List<AgentModel>>(emptyList()) }
+    val agentesFiltrados = when (filtroStatus) {
+
+        "Ordem alfabética" -> {
+            agentes.sortedBy { it.username.lowercase() }
+        }
+
+        "Ativos" -> {
+            agentes.filter { it.isActive }
+        }
+
+        "Inativos" -> {
+            agentes.filter { !it.isActive }
+        }
+
+        else -> agentes
+    }
+
     var isLoading by remember { mutableStateOf(true) }
     val authRepository = remember {
         AuthRepository()
@@ -112,6 +145,78 @@ fun GerenteHomeScreen(navController: NavController) {
                         fontSize = 16.sp,
                         color = Color.DarkGray
                     )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+// 🔥 FILTROS
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xFFF5F5F5)
+                        )
+                    ) {
+
+                        Column(
+                            modifier = Modifier.padding(12.dp)
+                        ) {
+
+                            Text(
+                                text = "Filtrar por:",
+                                fontWeight = FontWeight.Bold
+                            )
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            // 🔥 FILTRO STATUS
+                            ExposedDropdownMenuBox(
+                                expanded = expandedFiltro,
+                                onExpandedChange = {
+                                    expandedFiltro = !expandedFiltro
+                                }
+                            ) {
+
+                                OutlinedTextField(
+                                    value = filtroStatus,
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    label = {
+                                        Text("Status")
+                                    },
+                                    trailingIcon = {
+                                        ExposedDropdownMenuDefaults.TrailingIcon(
+                                            expanded = expandedFiltro
+                                        )
+                                    },
+                                    modifier = Modifier
+                                        .menuAnchor()
+                                        .fillMaxWidth()
+                                )
+
+                                ExposedDropdownMenu(
+                                    expanded = expandedFiltro,
+                                    onDismissRequest = {
+                                        expandedFiltro = false
+                                    }
+                                ) {
+
+                                    statusOptions.forEach { option ->
+
+                                        DropdownMenuItem(
+                                            text = {
+                                                Text(option)
+                                            },
+                                            onClick = {
+                                                filtroStatus = option
+                                                expandedFiltro = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
                 Divider(
@@ -173,6 +278,7 @@ fun GerenteHomeScreen(navController: NavController) {
         } else {
 
             // 🔥 sem agentes
+            // 🔥 sem agentes
             if (agentes.isEmpty()) {
 
                 Box(
@@ -201,7 +307,7 @@ fun GerenteHomeScreen(navController: NavController) {
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
 
-                    items(agentes) { agente ->
+                    items(agentesFiltrados) { agente ->
 
                         AgentListItem(
                             agente = agente,
@@ -284,7 +390,11 @@ fun AgentListItem(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 CustomButton(
-                    text = agente.role,
+                    text = "Cargo: " + if (agente.role.uppercase() == "AGENT") {
+                        "Agente"
+                    } else {
+                        "Admin"
+                    },
                     onClick = { },
                     modifier = Modifier.fillMaxWidth(0.5f),
                     containerColor = Color(0xFF388E3C),
