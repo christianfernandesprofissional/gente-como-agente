@@ -279,17 +279,6 @@ fun AgentListItem(
                         elevation = 2.dp,
                         shape = RoundedCornerShape(4.dp)
                     )
-
-                    CustomButton(
-                        text = "Excluir",
-                        onClick = { },
-                        containerColor = Color(0xFFD32F2F),
-                        contentColor = Color.White,
-                        fontSize = 11.sp,
-                        contentPadding = PaddingValues(horizontal = 8.dp),
-                        elevation = 2.dp,
-                        shape = RoundedCornerShape(4.dp)
-                    )
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))

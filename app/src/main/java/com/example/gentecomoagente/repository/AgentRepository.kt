@@ -127,10 +127,15 @@ class AgentRepository(
 
             .addOnSuccessListener { result ->
 
-                val agents = result.documents.mapNotNull { document ->
+                val agents = result.documents.map { document ->
 
-                    document.toObject(AgentModel::class.java)
-                        ?.copy(id = document.id)
+                    AgentModel(
+                        id = document.id,
+                        username = document.getString("username") ?: "",
+                        email = document.getString("email") ?: "",
+                        role = document.getString("role") ?: "",
+                        isActive = document.getBoolean("isActive") ?: true
+                    )
                 }
 
                 onSuccess(agents)
@@ -158,8 +163,13 @@ class AgentRepository(
 
                 if (document.exists()) {
 
-                    val agent = document
-                        .toObject(AgentModel::class.java)
+                    val agent = AgentModel(
+                        id = document.id,
+                        username = document.getString("username") ?: "",
+                        email = document.getString("email") ?: "",
+                        role = document.getString("role") ?: "",
+                        isActive = document.getBoolean("isActive") ?: true
+                    )
 
                     onSuccess(
                         agent?.copy(id = document.id)
