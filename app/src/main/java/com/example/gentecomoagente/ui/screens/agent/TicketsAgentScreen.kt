@@ -32,6 +32,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 
 
@@ -44,6 +45,9 @@ fun TicketsAgentScreen(navController: NavController) {
     var tickets by remember { mutableStateOf<List<TicketModel>>(emptyList()) }
     var agentName by remember { mutableStateOf("") }
 
+    var ticketListener by remember {
+        mutableStateOf<ListenerRegistration?>(null)
+    }
     var expandedFiltro by remember { mutableStateOf(false) }
 
     val filtros = listOf(
@@ -59,6 +63,8 @@ fun TicketsAgentScreen(navController: NavController) {
     }
 
     fun carregarTickets(filtro: String) {
+
+
 
         var query: Query = FirebaseFirestore.getInstance()
             .collection("tickets")
@@ -107,25 +113,29 @@ fun TicketsAgentScreen(navController: NavController) {
                 )
             }
         }
+        ticketListener?.remove()
+        ticketListener = query.addSnapshotListener { snapshot, error ->
 
-        query.get()
-            .addOnSuccessListener { result ->
-
-                tickets = result.documents.map { document ->
-
-                    TicketModel(
-                        customerName = document.getString("customerName") ?: "",
-                        customerEmail = document.getString("customerEmail") ?: "",
-                        problemType = document.getString("problemType") ?: "",
-                        status = document.getString("status") ?: "OPEN",
-                        createdAt = document.getTimestamp("createdAt"),
-                        assignedAgentId = document.getString("assignedAgentId"),
-                        lastMessage = document.getString("lastMessage") ?: "",
-                        lastMessageAt = document.getTimestamp("lastMessageAt"),
-                        accessCode = document.getString("accessCode") ?: ""
-                    )
-                }
+            if (error != null) {
+                return@addSnapshotListener
             }
+
+            tickets = snapshot?.documents?.map { document ->
+
+                TicketModel(
+                    customerName = document.getString("customerName") ?: "",
+                    customerEmail = document.getString("customerEmail") ?: "",
+                    problemType = document.getString("problemType") ?: "",
+                    status = document.getString("status") ?: "OPEN",
+                    createdAt = document.getTimestamp("createdAt"),
+                    assignedAgentId = document.getString("assignedAgentId"),
+                    lastMessage = document.getString("lastMessage") ?: "",
+                    lastMessageAt = document.getTimestamp("lastMessageAt"),
+                    accessCode = document.getString("accessCode") ?: ""
+                )
+
+            } ?: emptyList()
+        }
     }
 
     LaunchedEffect(Unit) {
