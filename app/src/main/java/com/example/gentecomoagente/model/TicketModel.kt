@@ -1,12 +1,16 @@
 package com.example.gentecomoagente.model
 
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.Exclude
 
 data class TicketModel(
+    @get:Exclude @set:Exclude
+    var id: String = "",
+
     val customerName: String = "",
     val customerEmail: String = "",
 
-    val problemType: String = "", // 👈 agora é só String
+    val problemType: String = "",
 
     val status: String = "OPEN",
     val createdAt: Timestamp? = null,

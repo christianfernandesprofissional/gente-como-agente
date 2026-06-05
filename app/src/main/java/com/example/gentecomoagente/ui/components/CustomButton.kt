@@ -19,9 +19,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.size
 
 @Composable
 fun CustomButton(
@@ -36,47 +33,26 @@ fun CustomButton(
     fontSize: TextUnit = 14.sp,
     fontWeight: FontWeight = FontWeight.SemiBold,
     icon: ImageVector? = null,
-    painterIcon: Painter? = null
+    enabled: Boolean = true
 ) {
     Button(
         onClick = onClick,
         modifier = modifier.heightIn(min = 28.dp),
+        enabled = enabled,
         shape = shape,
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
-            contentColor = contentColor
+            contentColor = contentColor,
+            disabledContainerColor = containerColor.copy(alpha = 0.5f),
+            disabledContentColor = contentColor.copy(alpha = 0.5f)
         ),
-        elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = elevation
-        ),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = elevation),
         contentPadding = contentPadding
     ) {
-
-        when {
-            icon != null -> {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-            }
-
-            painterIcon != null -> {
-                Image(
-                    painter = painterIcon,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp)
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-            }
+        if (icon != null) {
+            Icon(imageVector = icon, contentDescription = null)
+            Spacer(modifier = Modifier.width(8.dp))
         }
-
-        Text(
-            text = text,
-            fontSize = fontSize,
-            fontWeight = fontWeight
-        )
+        Text(text = text, fontSize = fontSize, fontWeight = fontWeight)
     }
 }

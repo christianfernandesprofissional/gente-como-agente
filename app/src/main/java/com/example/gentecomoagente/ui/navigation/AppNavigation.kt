@@ -35,8 +35,9 @@ fun AppNavigation() {
             ExistingTicketScreen(navController = navController)
         }
         // Rota 3: Tela de chat de atendimento do cliente
-        composable(Routes.CHAT_CLIENT) {
-            ChatClientScreen(navController = navController)
+        composable("${Routes.CHAT_CLIENT}/{ticketId}") { backStackEntry ->
+            val ticketId = backStackEntry.arguments?.getString("ticketId") ?: ""
+            ChatClientScreen(navController = navController, ticketId = ticketId)
         }
         //Rota 4: Tela de Login
         composable(Routes.LOGIN) {
