@@ -1,29 +1,110 @@
 package com.example.gentecomoagente.repository
 
+import android.util.Log
 import com.example.gentecomoagente.model.TicketModel
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlin.random.Random
+import java.security.MessageDigest
 
 class TicketRepository {
 
     private val db = FirebaseFirestore.getInstance()
     private val collection = db.collection("tickets")
 
+    private fun generateHash(input: String): String {
+        return MessageDigest.getInstance("SHA-256")
+            .digest(input.toByteArray())
+            .joinToString("") { "%02x".format(it) }
+            .take(8)
+            .uppercase()
+    }
+
     fun createTicket(
         ticket: TicketModel,
-        onSuccess: (String) -> Unit,
+        initialMessage: String,
+        onSuccess: (String, String) -> Unit, // ticketId, accessCode
         onError: (String) -> Unit
     ) {
-        // Gerar um código de acesso simples (Ex: 6 dígitos)
-        val accessCode = (100000..999999).random().toString()
-        val ticketWithCode = ticket.copy(accessCode = accessCode)
+        val counterRef = db.collection("metadata").document("ticket_counter")
 
-        collection.add(ticketWithCode)
-            .addOnSuccessListener { documentReference ->
-                onSuccess(accessCode)
+        db.runTransaction { transaction ->
+            Log.d("TicketRepository", "Iniciando transação para criar ticket")
+            // 1. Obter o contador atual (ou iniciar em 0 se não existir)
+            val snapshot = transaction.get(counterRef)
+            val nextId = (snapshot.getLong("lastId") ?: 0L) + 1
+            Log.d("TicketRepository", "Próximo ID sequencial: $nextId")
+
+            // 2. Preparar o ID sequencial
+            val sequentialId = "TCK-$nextId"
+            
+            // 3. Gerar código de acesso (Hash baseado no ID, Email e Timestamp)
+            val timestamp = ticket.createdAt?.toDate()?.time ?: System.currentTimeMillis()
+            val rawString = "$sequentialId-${ticket.customerEmail}-$timestamp"
+            val accessCode = generateHash(rawString)
+            
+            val ticketWithData = ticket.copy(accessCode = accessCode)
+
+            // 4. Criar o documento do ticket com o ID personalizado
+            val ticketRef = collection.document(sequentialId)
+            transaction.set(ticketRef, ticketWithData)
+            Log.d("TicketRepository", "Ticket document set: $sequentialId")
+
+            // 5. Criar a primeira mensagem na subcoleção "messages"
+            val messageRef = ticketRef.collection("messages").document()
+            val messageData = mapOf(
+                "content" to initialMessage,
+                "senderId" to ticket.customerEmail,
+                "senderType" to "CLIENT",
+                "timestamp" to com.google.firebase.Timestamp.now()
+            )
+            transaction.set(messageRef, messageData)
+            Log.d("TicketRepository", "Primeira mensagem setada")
+
+            // 6. Atualizar ou Criar o contador
+            transaction.set(counterRef, mapOf("lastId" to nextId))
+            Log.d("TicketRepository", "Contador atualizado para $nextId")
+
+            Pair(sequentialId, accessCode)
+        }.addOnSuccessListener { result ->
+            Log.d("TicketRepository", "Transação concluída com sucesso: ${result.first}")
+            onSuccess(result.first, result.second)
+        }.addOnFailureListener { e ->
+            Log.e("TicketRepository", "Falha na transação: ${e.message}", e)
+            onError(e.message ?: "Erro ao criar ticket")
+        }
+    }
+
+    fun listenToMessages(ticketId: String, onUpdate: (List<com.example.gentecomoagente.model.ChatMessage>) -> Unit) {
+        collection.document(ticketId).collection("messages")
+            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.ASCENDING)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null || snapshot == null) return@addSnapshotListener
+                
+                val messages = snapshot.documents.mapNotNull { doc ->
+                    doc.toObject(com.example.gentecomoagente.model.ChatMessage::class.java)
+                }
+                onUpdate(messages)
+            }
+    }
+
+    fun sendMessage(ticketId: String, message: com.example.gentecomoagente.model.ChatMessage, onSuccess: () -> Unit, onError: (String) -> Unit) {
+        collection.document(ticketId).collection("messages")
+            .add(message)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e -> onError(e.message ?: "Erro ao enviar mensagem") }
+    }
+
+    fun getTicket(ticketId: String, onSuccess: (TicketModel?) -> Unit, onError: (String) -> Unit) {
+        collection.document(ticketId).get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val ticket = document.toObject(TicketModel::class.java)
+                    onSuccess(ticket?.copy(id = document.id))
+                } else {
+                    onSuccess(null)
+                }
             }
             .addOnFailureListener { e ->
-                onError(e.message ?: "Erro ao criar ticket")
+                onError(e.message ?: "Erro ao buscar ticket")
             }
     }
 }

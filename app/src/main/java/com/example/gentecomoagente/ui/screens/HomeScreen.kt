@@ -1,13 +1,11 @@
 package com.example.gentecomoagente.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,16 +15,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.gentecomoagente.model.ProblemTypeModel
+import com.example.gentecomoagente.model.TicketModel
 import com.example.gentecomoagente.repository.ProblemTypeRepository
+import com.example.gentecomoagente.repository.TicketRepository
 import com.example.gentecomoagente.ui.components.CustomButton
 import com.example.gentecomoagente.ui.components.CustomDropdown
 import com.example.gentecomoagente.ui.components.CustomTextField
 import com.example.gentecomoagente.ui.navigation.Routes
+import com.google.firebase.Timestamp
 
 
 @Composable
 fun HomeScreen(navController: NavController) {
-    val repository = remember { ProblemTypeRepository() }
+    val problemRepository = remember { ProblemTypeRepository() }
+    val ticketRepository = remember { TicketRepository() }
     
     // ESTADOS
     var nome by remember { mutableStateOf("") }
@@ -36,9 +38,16 @@ fun HomeScreen(navController: NavController) {
     var problemTypes by remember { mutableStateOf<List<ProblemTypeModel>>(emptyList()) }
     var problemaSelecionado by remember { mutableStateOf("") }
 
+    var showSuccessDialog by remember { mutableStateOf(false) }
+    var createdTicketId by remember { mutableStateOf("") }
+    var createdAccessCode by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+
+    val isFormValid = nome.isNotBlank() && email.isNotBlank() && descricao.isNotBlank() && problemaSelecionado.isNotBlank()
+
     // Carregar tipos de problema do Firestore
     LaunchedEffect(Unit) {
-        repository.findAll(
+        problemRepository.findAll(
             onSuccess = { list ->
                 problemTypes = list
                 if (list.isNotEmpty()) {
@@ -149,13 +158,69 @@ fun HomeScreen(navController: NavController) {
                     )
 
                     CustomButton(
-                        text = "Iniciar Atendimento",
-                        onClick = { navController.navigate(Routes.CHAT_CLIENT) },
+                        text = if (isLoading) "Enviando..." else "Iniciar Atendimento",
+                        onClick = {
+                            isLoading = true
+                            val newTicket = TicketModel(
+                                customerName = nome,
+                                customerEmail = email,
+                                problemType = problemaSelecionado,
+                                status = "OPEN",
+                                createdAt = Timestamp.now(),
+                                lastMessage = descricao,
+                                lastMessageAt = Timestamp.now()
+                            )
+
+                            ticketRepository.createTicket(
+                                ticket = newTicket,
+                                initialMessage = descricao,
+                                onSuccess = { id, accessCode ->
+                                    createdTicketId = id
+                                    createdAccessCode = accessCode
+                                    showSuccessDialog = true
+                                    isLoading = false
+                                },
+                                onError = { error ->
+                                    isLoading = false
+                                    Log.e("HomeScreen", "Erro ao criar ticket: $error")
+                                }
+                            )
+                        },
+                        enabled = isFormValid && !isLoading,
                         modifier = Modifier.weight(1f)
                     )
                 }
             }
         }
     }
-}
 
+    if (showSuccessDialog) {
+        AlertDialog(
+            onDismissRequest = { showSuccessDialog = false },
+            title = { Text("Ticket Criado com Sucesso!") },
+            text = {
+                Column {
+                    Text("Número do Ticket:", fontSize = 14.sp)
+                    Text(text = createdTicketId, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1976D2))
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    Text("Código de Acesso:", fontSize = 14.sp)
+                    Text(text = createdAccessCode, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFFD32F2F))
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    Text("IMPORTANTE: Guarde esses dados para consultar seu atendimento futuramente.", fontSize = 12.sp, color = Color.Gray)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showSuccessDialog = false
+                    navController.navigate("${Routes.CHAT_CLIENT}/$createdTicketId")
+                }) {
+                    Text("Ir para o Atendimento")
+                }
+            }
+        )
+    }
+}
