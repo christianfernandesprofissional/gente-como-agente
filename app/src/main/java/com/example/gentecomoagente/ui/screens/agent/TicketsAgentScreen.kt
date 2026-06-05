@@ -1,5 +1,6 @@
 package com.example.gentecomoagente.ui.screens.agent
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,6 +32,7 @@ import com.example.gentecomoagente.ui.navigation.Routes
 import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.example.gentecomoagente.repository.AgentRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
@@ -41,6 +43,8 @@ import com.google.firebase.firestore.Query
 fun TicketsAgentScreen(navController: NavController) {
 
     val authRepository = remember { AuthRepository() }
+    val agentRepository = remember { AgentRepository() }
+    var agentRole by remember { mutableStateOf("") }
 
     var tickets by remember { mutableStateOf<List<TicketModel>>(emptyList()) }
     var agentName by remember { mutableStateOf("") }
@@ -123,6 +127,7 @@ fun TicketsAgentScreen(navController: NavController) {
             tickets = snapshot?.documents?.map { document ->
 
                 TicketModel(
+                    id = document.id,
                     customerName = document.getString("customerName") ?: "",
                     customerEmail = document.getString("customerEmail") ?: "",
                     problemType = document.getString("problemType") ?: "",
@@ -151,6 +156,7 @@ fun TicketsAgentScreen(navController: NavController) {
                 .addOnSuccessListener { document ->
 
                     agentName = document.getString("username") ?: "Agente"
+                    agentRole = document.getString("role") ?: "AGENT" // 🔥 AQUI
                 }
         }
 
@@ -285,7 +291,10 @@ fun TicketsAgentScreen(navController: NavController) {
                         TicketListItem(
                             ticket = ticket,
                             onActionClick = {
-                                navController.navigate(Routes.CHAT_AGENT)
+                                Log.d("CHAT", "ticketId recebido: ${ticket.id}")
+                                if (agentRole.isNotBlank()) {
+                                    navController.navigate("${Routes.CHAT_GERAL}/${ticket.id}/$agentRole")
+                                }
                             }
                         )
                     }

@@ -1,6 +1,7 @@
 package com.example.gentecomoagente.repository
 
 import android.util.Log
+import com.example.gentecomoagente.model.ChatMessage
 import com.example.gentecomoagente.model.TicketModel
 import com.google.firebase.firestore.FirebaseFirestore
 import java.security.MessageDigest
@@ -9,6 +10,7 @@ class TicketRepository {
 
     private val db = FirebaseFirestore.getInstance()
     private val collection = db.collection("tickets")
+
 
     private fun generateHash(input: String): String {
         return MessageDigest.getInstance("SHA-256")
@@ -86,11 +88,33 @@ class TicketRepository {
             }
     }
 
-    fun sendMessage(ticketId: String, message: com.example.gentecomoagente.model.ChatMessage, onSuccess: () -> Unit, onError: (String) -> Unit) {
-        collection.document(ticketId).collection("messages")
-            .add(message)
+    fun sendMessage(
+        ticketId: String,
+        message: ChatMessage,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+
+        val batch = db.batch()
+
+        val ticketRef = collection.document(ticketId)
+        val messageRef = ticketRef.collection("messages").document()
+
+        // 1. salvar mensagem
+        batch.set(messageRef, message)
+
+        // 2. atualizar ticket
+        batch.update(ticketRef, mapOf(
+            "lastMessage" to message.content,
+            "lastMessageAt" to message.timestamp
+        ))
+
+        // 3. executar tudo junto
+        batch.commit()
             .addOnSuccessListener { onSuccess() }
-            .addOnFailureListener { e -> onError(e.message ?: "Erro ao enviar mensagem") }
+            .addOnFailureListener { e ->
+                onError(e.message ?: "Erro ao enviar mensagem")
+            }
     }
 
     fun getTicket(ticketId: String, onSuccess: (TicketModel?) -> Unit, onError: (String) -> Unit) {
@@ -123,6 +147,7 @@ class TicketRepository {
                 val tickets = result.documents.mapNotNull { document ->
 
                     TicketModel(
+                        id = document.id,
                         customerName = document.getString("customerName") ?: "",
                         customerEmail = document.getString("customerEmail") ?: "",
                         problemType = document.getString("problemType") ?: "",

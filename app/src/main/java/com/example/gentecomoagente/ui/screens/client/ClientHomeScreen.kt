@@ -30,39 +30,7 @@ import com.example.gentecomoagente.ui.navigation.Routes
 
 @Composable
 fun ClientHomeScreen(navController: NavController) {
-    // 1. DADOS FALSOS
-    val ticketsfake = remember {
-        listOf(
-            TicketModel(
-                customerName = "Gustavo",
-                customerEmail = "gustavo@email.com",
-                problemType = "Carrinho com problema",
-                status = "IN_PROGRESS",
-                accessCode = "123456"
-            ),
-            TicketModel(
-                customerName = "Maria",
-                customerEmail = "maria@email.com",
-                problemType = "Dúvida sobre estorno",
-                status = "OPEN",
-                accessCode = "654321"
-            ),
-            TicketModel(
-                customerName = "João",
-                customerEmail = "joao@email.com",
-                problemType = "Site fora do ar",
-                status = "CLOSED",
-                accessCode = "999999"
-            ),
-            TicketModel(
-                customerName = "Ana",
-                customerEmail = "ana@email.com",
-                problemType = "Erro ao aplicar cupom",
-                status = "OPEN",
-                accessCode = "777777"
-            )
-        )
-    }
+
     val ticketService = remember {
         TicketService()
     }
@@ -134,7 +102,7 @@ fun ClientHomeScreen(navController: NavController) {
 
             CustomButton(
                 text = "Novo atendimento",
-                onClick = { navController.navigate(Routes.TICKET_EXISTENTE) },
+                onClick = { navController.navigate(Routes.TELA_INICIAL) },
                 modifier = Modifier.weight(1f)
             )
         }
@@ -170,7 +138,7 @@ fun ClientHomeScreen(navController: NavController) {
 
                 items(tickets) { ticket ->
 
-                    GerenteTicketCard(ticket)
+                    GerenteTicketCard(ticket, navController)
                 }
             }
         }
@@ -179,7 +147,7 @@ fun ClientHomeScreen(navController: NavController) {
 
 // --- COMPONENTE: CARD DO TICKET ---
 @Composable
-fun GerenteTicketCard(ticket: TicketModel) {
+fun GerenteTicketCard(ticket: TicketModel, navController: NavController) {
 
     val statusText = when (ticket.status) {
         "OPEN" -> "Não iniciado"
@@ -227,7 +195,9 @@ fun GerenteTicketCard(ticket: TicketModel) {
                 // 🔹 Botão dinâmico
                 CustomButton(
                     text = buttonText,
-                    onClick = { /* ação depois */ },
+                    onClick = {
+                        navController.navigate("${Routes.CHAT_GERAL}/${ticket.id}/CLIENT")
+                    },
                     containerColor = Color(0xFF4CAF50),
                     contentColor = Color.White,
                     shape = RoundedCornerShape(6.dp),

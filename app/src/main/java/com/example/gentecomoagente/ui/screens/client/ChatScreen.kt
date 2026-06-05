@@ -24,6 +24,8 @@ import com.example.gentecomoagente.ui.components.CustomButton
 import com.example.gentecomoagente.ui.components.TypingIndicator
 import com.google.firebase.Timestamp
 
+
+//CHAT NOVO CHAT NOVO CHAT NOVO CHAT NOVO
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(navController: NavController, ticketId: String, userType: String) {
@@ -91,10 +93,10 @@ fun ChatScreen(navController: NavController, ticketId: String, userType: String)
                 CustomButton(
                     text = "Encerrar Ticket",
                     onClick = {
-                        ticketRepository.updateTicketStatus(ticketId, "CLOSED",
-                            onSuccess = { ticketStatus = "CLOSED" },
-                            onError = { /* Tratar erro */ }
-                        )
+                        //ticketRepository.updateTicketStatus(ticketId, "CLOSED",
+                         //   onSuccess = { ticketStatus = "CLOSED" },
+                         //   onError = { /* Tratar erro */ }
+                       // )
                     },
                     containerColor = Color(0xFFE57373),
                     contentColor = Color.White
@@ -131,7 +133,7 @@ fun ChatScreen(navController: NavController, ticketId: String, userType: String)
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(messages) { msg ->
-                    ChatMessageBubble(message = msg, currentUserType = userType)
+                    ChatMessageBubble(message = msg)
                 }
             }
         }

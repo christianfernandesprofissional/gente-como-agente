@@ -8,6 +8,9 @@ object Routes {
     const val TICKET_EXISTENTE = "ticket_screen"
     const val CHAT_CLIENT = "chat_client_screen"
 
+
+    const val CHAT_GERAL = "chat_screen"
+
     const val CLIENT_HOME = "client_home_screen"
 
     // Autenticação
@@ -24,6 +27,6 @@ object Routes {
     const val GERENTE_TICKETS = "gerente_ticket_screen"
     const val PROBLEM_TYPE = "problem_type_screen"
     const val AGENT_CREATION = "agent_creation_screen"
-
     const val AGENT_EDIT = "agent_edit_screen"
+
 }

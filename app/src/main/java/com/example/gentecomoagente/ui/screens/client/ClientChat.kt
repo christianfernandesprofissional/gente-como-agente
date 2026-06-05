@@ -26,6 +26,8 @@ import com.example.gentecomoagente.ui.components.CustomTopHeader
 import com.example.gentecomoagente.ui.components.TypingIndicator
 import kotlinx.coroutines.launch
 
+
+// CHAT ANTIGO CHAT ANTIGO CHAT ANTIGO CHAT ANTIGO
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatClientScreen(navController: NavController, ticketId: String) {

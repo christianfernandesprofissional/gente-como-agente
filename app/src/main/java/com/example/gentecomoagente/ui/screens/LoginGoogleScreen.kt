@@ -143,7 +143,7 @@ fun LoginGoogleScreen(navController: NavController) {
                     else
                         "Login com Google",
 
-                    painterIcon = painterResource(
+                    iconPainter = painterResource(
                         id = R.drawable.icon_google
                     ),
                     onClick = {
