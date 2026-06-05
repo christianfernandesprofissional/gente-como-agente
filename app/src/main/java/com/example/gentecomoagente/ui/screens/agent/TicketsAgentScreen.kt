@@ -6,6 +6,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,8 +32,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.Query
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TicketsAgentScreen(navController: NavController) {
 
@@ -37,25 +44,71 @@ fun TicketsAgentScreen(navController: NavController) {
     var tickets by remember { mutableStateOf<List<TicketModel>>(emptyList()) }
     var agentName by remember { mutableStateOf("") }
 
-    LaunchedEffect(Unit) {
+    var expandedFiltro by remember { mutableStateOf(false) }
 
-        val currentUser = FirebaseAuth.getInstance().currentUser
+    val filtros = listOf(
+        "Data de Criação",
+        "Última Mensagem",
+        "Abertos",
+        "Em Andamento",
+        "Fechados"
+    )
 
-        currentUser?.let { user ->
+    var filtroSelecionado by remember {
+        mutableStateOf("Data de Criação")
+    }
 
-            FirebaseFirestore.getInstance()
-                .collection("users")
-                .document(user.uid)
-                .get()
-                .addOnSuccessListener { document ->
+    fun carregarTickets(filtro: String) {
 
-                    agentName = document.getString("username") ?: "Agente"
-                }
+        var query: Query = FirebaseFirestore.getInstance()
+            .collection("tickets")
+
+        query = when (filtro) {
+
+            "Data de Criação" -> {
+                query.orderBy(
+                    "createdAt",
+                    Query.Direction.DESCENDING
+                )
+            }
+
+            "Última Mensagem" -> {
+                query.orderBy(
+                    "lastMessageAt",
+                    Query.Direction.DESCENDING
+                )
+            }
+
+            "Abertos" -> {
+                query.whereEqualTo(
+                    "status",
+                    "OPEN"
+                )
+            }
+
+            "Em Andamento" -> {
+                query.whereEqualTo(
+                    "status",
+                    "IN_PROGRESS"
+                )
+            }
+
+            "Fechados" -> {
+                query.whereEqualTo(
+                    "status",
+                    "CLOSED"
+                )
+            }
+
+            else -> {
+                query.orderBy(
+                    "createdAt",
+                    Query.Direction.DESCENDING
+                )
+            }
         }
 
-        FirebaseFirestore.getInstance()
-            .collection("tickets")
-            .get()
+        query.get()
             .addOnSuccessListener { result ->
 
                 tickets = result.documents.map { document ->
@@ -73,6 +126,25 @@ fun TicketsAgentScreen(navController: NavController) {
                     )
                 }
             }
+    }
+
+    LaunchedEffect(Unit) {
+
+        val currentUser = FirebaseAuth.getInstance().currentUser
+
+        currentUser?.let { user ->
+
+            FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(user.uid)
+                .get()
+                .addOnSuccessListener { document ->
+
+                    agentName = document.getString("username") ?: "Agente"
+                }
+        }
+
+        carregarTickets("Data de Criação")
     }
 
     Column(
@@ -126,6 +198,59 @@ fun TicketsAgentScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            ExposedDropdownMenuBox(
+                expanded = expandedFiltro,
+                onExpandedChange = {
+                    expandedFiltro = !expandedFiltro
+                }
+            ) {
+
+                OutlinedTextField(
+                    value = filtroSelecionado,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = {
+                        Text("Filtro")
+                    },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(
+                            expanded = expandedFiltro
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor()
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expandedFiltro,
+                    onDismissRequest = {
+                        expandedFiltro = false
+                    }
+                ) {
+
+                    filtros.forEach { filtro ->
+
+                        DropdownMenuItem(
+                            text = {
+                                Text(filtro)
+                            },
+                            onClick = {
+
+                                filtroSelecionado = filtro
+                                expandedFiltro = false
+
+                                carregarTickets(filtro)
+                            }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             if (tickets.isEmpty()) {
 
                 Box(
@@ -158,6 +283,8 @@ fun TicketsAgentScreen(navController: NavController) {
             }
         }
     }
+
+
 }
 
 @Composable
@@ -242,5 +369,9 @@ fun TicketListItem(
             }
         }
     }
+
+
 }
+
+
 
