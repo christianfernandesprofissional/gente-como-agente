@@ -26,4 +26,42 @@ class TicketRepository {
                 onError(e.message ?: "Erro ao criar ticket")
             }
     }
+
+    fun findTicketsByCustomerEmail(
+        email: String,
+        onSuccess: (List<TicketModel>) -> Unit,
+        onError: (String) -> Unit
+    ) {
+
+        collection
+            .whereEqualTo("customerEmail", email)
+            .get()
+
+            .addOnSuccessListener { result ->
+
+                val tickets = result.documents.mapNotNull { document ->
+
+                    TicketModel(
+                        customerName = document.getString("customerName") ?: "",
+                        customerEmail = document.getString("customerEmail") ?: "",
+                        problemType = document.getString("problemType") ?: "",
+                        status = document.getString("status") ?: "OPEN",
+                        accessCode = document.getString("accessCode") ?: "",
+                        assignedAgentId = document.getString("assignedAgentId"),
+                        lastMessage = document.getString("lastMessage") ?: "",
+                        createdAt = document.getTimestamp("createdAt"),
+                        lastMessageAt = document.getTimestamp("lastMessageAt")
+                    )
+                }
+
+                onSuccess(tickets)
+            }
+
+            .addOnFailureListener { e ->
+
+                onError(
+                    e.message ?: "Erro ao buscar tickets"
+                )
+            }
+    }
 }

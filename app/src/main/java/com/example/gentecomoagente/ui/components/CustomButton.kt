@@ -19,6 +19,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.size
 
 @Composable
 fun CustomButton(
@@ -32,7 +35,8 @@ fun CustomButton(
     elevation: Dp = 0.dp,
     fontSize: TextUnit = 14.sp,
     fontWeight: FontWeight = FontWeight.SemiBold,
-    icon: ImageVector? = null
+    icon: ImageVector? = null,
+    painterIcon: Painter? = null
 ) {
     Button(
         onClick = onClick,
@@ -42,13 +46,37 @@ fun CustomButton(
             containerColor = containerColor,
             contentColor = contentColor
         ),
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = elevation),
+        elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = elevation
+        ),
         contentPadding = contentPadding
     ) {
-        if (icon != null) {
-            Icon(imageVector = icon, contentDescription = null)
-            Spacer(modifier = Modifier.width(8.dp))
+
+        when {
+            icon != null -> {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+
+            painterIcon != null -> {
+                Image(
+                    painter = painterIcon,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+            }
         }
-        Text(text = text, fontSize = fontSize, fontWeight = fontWeight)
+
+        Text(
+            text = text,
+            fontSize = fontSize,
+            fontWeight = fontWeight
+        )
     }
 }

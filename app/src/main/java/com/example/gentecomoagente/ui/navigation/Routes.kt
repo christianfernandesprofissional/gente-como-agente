@@ -8,8 +8,12 @@ object Routes {
     const val TICKET_EXISTENTE = "ticket_screen"
     const val CHAT_CLIENT = "chat_client_screen"
 
+    const val CLIENT_HOME = "client_home_screen"
+
     // Autenticação
     const val LOGIN = "login_screen"
+
+    const val LOGIN_Google = "login_google"
 
     // Agente
     const val TICKETS_AGENT = "tickets_agent_screen"

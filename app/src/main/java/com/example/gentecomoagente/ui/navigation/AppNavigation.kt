@@ -5,10 +5,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.gentecomoagente.ui.screens.HomeScreen
+import com.example.gentecomoagente.ui.screens.LoginGoogleScreen
 import com.example.gentecomoagente.ui.screens.LoginScreen
 import com.example.gentecomoagente.ui.screens.agent.AtendimentoScreen
 import com.example.gentecomoagente.ui.screens.agent.TicketsAgentScreen
 import com.example.gentecomoagente.ui.screens.client.ChatClientScreen
+import com.example.gentecomoagente.ui.screens.client.ClientHomeScreen
 import com.example.gentecomoagente.ui.screens.client.ExistingTicketScreen
 import com.example.gentecomoagente.ui.screens.gerente.AgentCreationScreen
 import com.example.gentecomoagente.ui.screens.gerente.AgentEditScreen
@@ -22,7 +24,7 @@ fun AppNavigation() {
     val navController = rememberNavController()
 
     // O NavHost é o mapa. O startDestination é a tela que abre primeiro.
-    NavHost(navController = navController, startDestination = Routes.TELA_INICIAL) {
+    NavHost(navController = navController, startDestination = Routes.LOGIN_Google) {
 
         // Rota 1: Tela de Suporte
         composable(Routes.TELA_INICIAL) {
@@ -83,6 +85,16 @@ fun AppNavigation() {
                 navController = navController,
                 agentId = agentId
             )
+        }
+
+        // Rota 12: ClienteHomeScreen
+        composable(Routes.CLIENT_HOME) {
+            ClientHomeScreen(navController = navController)
+        }
+
+        // Rota 12: Login-google
+        composable(Routes.LOGIN_Google) {
+            LoginGoogleScreen(navController = navController)
         }
     }
 }
