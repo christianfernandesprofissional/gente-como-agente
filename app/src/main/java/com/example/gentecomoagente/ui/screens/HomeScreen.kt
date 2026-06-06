@@ -1,13 +1,11 @@
 package com.example.gentecomoagente.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,28 +15,43 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.gentecomoagente.model.ProblemTypeModel
+import com.example.gentecomoagente.model.TicketModel
 import com.example.gentecomoagente.repository.ProblemTypeRepository
+import com.example.gentecomoagente.repository.TicketRepository
 import com.example.gentecomoagente.ui.components.CustomButton
 import com.example.gentecomoagente.ui.components.CustomDropdown
 import com.example.gentecomoagente.ui.components.CustomTextField
 import com.example.gentecomoagente.ui.navigation.Routes
+import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
 fun HomeScreen(navController: NavController) {
-    val repository = remember { ProblemTypeRepository() }
+    val problemRepository = remember { ProblemTypeRepository() }
+    val ticketRepository = remember { TicketRepository() }
+
+    val auth = FirebaseAuth.getInstance()
+    val currentEmail = auth.currentUser?.email ?: ""
     
     // ESTADOS
     var nome by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf(currentEmail) }
     var descricao by remember { mutableStateOf("") }
 
     var problemTypes by remember { mutableStateOf<List<ProblemTypeModel>>(emptyList()) }
     var problemaSelecionado by remember { mutableStateOf("") }
 
+    var showSuccessDialog by remember { mutableStateOf(false) }
+    var createdTicketId by remember { mutableStateOf("") }
+    var createdAccessCode by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+
+    val isFormValid = nome.isNotBlank() && email.isNotBlank() && descricao.isNotBlank() && problemaSelecionado.isNotBlank()
+
     // Carregar tipos de problema do Firestore
     LaunchedEffect(Unit) {
-        repository.findAll(
+        problemRepository.findAll(
             onSuccess = { list ->
                 problemTypes = list
                 if (list.isNotEmpty()) {
@@ -71,10 +84,14 @@ fun HomeScreen(navController: NavController) {
                     .verticalScroll(rememberScrollState())
             ) {
                 // --- CABEÇALHO ESPECÍFICO DESTA TELA ---
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     CustomButton(
-                        text = "Acessar como Funcionário",
-                        onClick = { navController.navigate(Routes.LOGIN) }
+                        text = "Voltar",
+                        onClick = { navController.popBackStack() }
                     )
                 }
 
@@ -113,7 +130,8 @@ fun HomeScreen(navController: NavController) {
                 CustomTextField(
                     label = "Email",
                     value = email,
-                    onValueChange = { email = it }
+                    onValueChange = { },
+                    readOnly = true
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -142,20 +160,76 @@ fun HomeScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    CustomButton(
-                        text = "Ticket Existente",
-                        onClick = { navController.navigate(Routes.TICKET_EXISTENTE) },
-                        modifier = Modifier.weight(1f)
-                    )
+//                    CustomButton(
+//                        text = "Ticket Existente",
+//                        onClick = { navController.navigate(Routes.TICKET_EXISTENTE) },
+//                        modifier = Modifier.weight(1f)
+//                    )
 
                     CustomButton(
-                        text = "Iniciar Atendimento",
-                        onClick = { navController.navigate(Routes.CHAT_CLIENT) },
+                        text = if (isLoading) "Enviando..." else "Iniciar Atendimento",
+                        onClick = {
+                            isLoading = true
+                            val newTicket = TicketModel(
+                                customerName = nome,
+                                customerEmail = email,
+                                problemType = problemaSelecionado,
+                                status = "OPEN",
+                                createdAt = Timestamp.now(),
+                                lastMessage = descricao,
+                                lastMessageAt = Timestamp.now()
+                            )
+
+                            ticketRepository.createTicket(
+                                ticket = newTicket,
+                                initialMessage = descricao,
+                                onSuccess = { id, accessCode ->
+                                    createdTicketId = id
+                                    createdAccessCode = accessCode
+                                    showSuccessDialog = true
+                                    isLoading = false
+                                },
+                                onError = { error ->
+                                    isLoading = false
+                                    Log.e("HomeScreen", "Erro ao criar ticket: $error")
+                                }
+                            )
+                        },
+                        enabled = isFormValid && !isLoading,
                         modifier = Modifier.weight(1f)
                     )
                 }
             }
         }
     }
-}
 
+    if (showSuccessDialog) {
+        AlertDialog(
+            onDismissRequest = { showSuccessDialog = false },
+            title = { Text("Ticket Criado com Sucesso!") },
+            text = {
+                Column {
+                    Text("Número do Ticket:", fontSize = 14.sp)
+                    Text(text = createdTicketId, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1976D2))
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    Text("Código de Acesso:", fontSize = 14.sp)
+                    Text(text = createdAccessCode, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFFD32F2F))
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    Text("IMPORTANTE: Guarde esses dados para consultar seu atendimento futuramente.", fontSize = 12.sp, color = Color.Gray)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showSuccessDialog = false
+                    navController.navigate("${Routes.CHAT_GERAL}/$createdTicketId/CLIENT")
+                }) {
+                    Text("Ir para o Atendimento")
+                }
+            }
+        )
+    }
+}

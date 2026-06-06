@@ -1,14 +1,19 @@
 package com.example.gentecomoagente.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.gentecomoagente.ui.screens.HomeScreen
+import com.example.gentecomoagente.ui.screens.LoginGoogleScreen
 import com.example.gentecomoagente.ui.screens.LoginScreen
 import com.example.gentecomoagente.ui.screens.agent.AtendimentoScreen
 import com.example.gentecomoagente.ui.screens.agent.TicketsAgentScreen
 import com.example.gentecomoagente.ui.screens.client.ChatClientScreen
+import com.example.gentecomoagente.ui.screens.client.ChatScreen
+import com.example.gentecomoagente.ui.screens.client.ClientHomeScreen
 import com.example.gentecomoagente.ui.screens.client.ExistingTicketScreen
 import com.example.gentecomoagente.ui.screens.gerente.AgentCreationScreen
 import com.example.gentecomoagente.ui.screens.gerente.AgentEditScreen
@@ -22,7 +27,7 @@ fun AppNavigation() {
     val navController = rememberNavController()
 
     // O NavHost é o mapa. O startDestination é a tela que abre primeiro.
-    NavHost(navController = navController, startDestination = Routes.TELA_INICIAL) {
+    NavHost(navController = navController, startDestination = Routes.LOGIN_Google) {
 
         // Rota 1: Tela de Suporte
         composable(Routes.TELA_INICIAL) {
@@ -33,8 +38,9 @@ fun AppNavigation() {
             ExistingTicketScreen(navController = navController)
         }
         // Rota 3: Tela de chat de atendimento do cliente
-        composable(Routes.CHAT_CLIENT) {
-            ChatClientScreen(navController = navController)
+        composable("${Routes.CHAT_CLIENT}/{ticketId}") { backStackEntry ->
+            val ticketId = backStackEntry.arguments?.getString("ticketId") ?: ""
+            ChatClientScreen(navController = navController, ticketId = ticketId)
         }
         //Rota 4: Tela de Login
         composable(Routes.LOGIN) {
@@ -82,6 +88,35 @@ fun AppNavigation() {
             AgentEditScreen(
                 navController = navController,
                 agentId = agentId
+            )
+        }
+
+        // Rota 12: ClienteHomeScreen
+        composable(Routes.CLIENT_HOME) {
+            ClientHomeScreen(navController = navController)
+        }
+
+        // Rota 13: Login-google
+        composable(Routes.LOGIN_Google) {
+            LoginGoogleScreen(navController = navController)
+        }
+
+        // Rota 14: Tela de chat de atendimento que recebe tanto cliente quanto agente
+        composable(
+            route = "${Routes.CHAT_GERAL}/{ticketId}/{userType}",
+            arguments = listOf(
+                navArgument("ticketId") { type = NavType.StringType },
+                navArgument("userType") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+
+            val ticketId = backStackEntry.arguments?.getString("ticketId") ?: ""
+            val userType = backStackEntry.arguments?.getString("userType") ?: ""
+
+            ChatScreen(
+                navController = navController,
+                ticketId = ticketId,
+                userType = userType
             )
         }
     }

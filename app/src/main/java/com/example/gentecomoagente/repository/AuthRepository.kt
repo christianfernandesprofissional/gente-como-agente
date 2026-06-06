@@ -2,6 +2,7 @@ package com.example.gentecomoagente.repository
 
 import android.content.Context
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 
 class AuthRepository(
     private val context: Context? = null
@@ -61,6 +62,29 @@ class AuthRepository(
 
                 onError(
                     e.message ?: "Erro ao criar usuário"
+                )
+            }
+    }
+
+    fun loginWithGoogle(
+        idToken: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+
+        val credential = GoogleAuthProvider.getCredential(
+            idToken,
+            null
+        )
+
+        auth.signInWithCredential(credential)
+            .addOnSuccessListener {
+                onSuccess()
+            }
+            .addOnFailureListener { e ->
+
+                onError(
+                    e.message ?: "Erro ao fazer login com Google"
                 )
             }
     }

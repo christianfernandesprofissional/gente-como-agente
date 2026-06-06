@@ -19,38 +19,56 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.gentecomoagente.model.ChatMessage
+import com.example.gentecomoagente.repository.TicketRepository
 import com.example.gentecomoagente.ui.components.ChatMessageBubble
 import com.example.gentecomoagente.ui.components.CustomButton
 import com.example.gentecomoagente.ui.components.CustomTopHeader
 import com.example.gentecomoagente.ui.components.TypingIndicator
 import kotlinx.coroutines.launch
 
+
+// CHAT ANTIGO CHAT ANTIGO CHAT ANTIGO CHAT ANTIGO
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatClientScreen(navController: NavController) {
+fun ChatClientScreen(navController: NavController, ticketId: String) {
+    val ticketRepository = remember { TicketRepository() }
+    
     // ESTADOS
     var inputText by remember { mutableStateOf("") }
-    val ticketNumber = "TKT-001234"
+    val messages = remember { mutableStateListOf<ChatMessage>() }
+    var accessCode by remember { mutableStateOf("...") }
+    var customerEmail by remember { mutableStateOf("client") }
 
-    val messages = remember {
-        mutableStateListOf(
-            ChatMessage(
-                senderId = "agent_1",
-                senderType = "AGENT",
-                content = "Olá, Gustavo. Tudo bem? Vou te ajudar com o seu problema de acesso."
-            ),
-            ChatMessage(
-                senderId = "client_1",
-                senderType = "CLIENT",
-                content = "Estou com um problema ao acessar o site de vendas..."
-            )
+    // Carregar dados do ticket (incluindo accessCode)
+    LaunchedEffect(ticketId) {
+        ticketRepository.getTicket(ticketId, 
+            onSuccess = { ticket ->
+                accessCode = ticket?.accessCode ?: "N/A"
+                customerEmail = ticket?.customerEmail ?: "client"
+            },
+            onError = { /* Tratar erro */ }
         )
     }
 
-    var isAgentTyping by remember { mutableStateOf(true) }
+    // Escutar mensagens em tempo real
+    LaunchedEffect(ticketId) {
+        ticketRepository.listenToMessages(ticketId) { updatedMessages ->
+            messages.clear()
+            messages.addAll(updatedMessages)
+        }
+    }
+
+    var isAgentTyping by remember { mutableStateOf(false) } // Pode ser implementado no futuro
 
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+
+    // Rolagem automática para a última mensagem
+    LaunchedEffect(messages.size) {
+        if (messages.isNotEmpty()) {
+            listState.animateScrollToItem(messages.size - 1)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -64,9 +82,9 @@ fun ChatClientScreen(navController: NavController) {
             onClickButton = { navController.popBackStack() }
         )
 
-        // --- NÚMERO DO TICKET ---
+        // --- PROTOCOLO (ACCESS CODE) ---
         Text(
-            text = "Ticket: $ticketNumber",
+            text = "Protocolo: $accessCode",
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 12.dp),
@@ -111,7 +129,7 @@ fun ChatClientScreen(navController: NavController) {
                 value = inputText,
                 onValueChange = { inputText = it },
                 placeholder = {
-                    Text("Tudo bem. O que devo te informar?", color = Color.Gray)
+                    Text("Digite sua mensagem...", color = Color.Gray)
                 },
                 modifier = Modifier.weight(1f),
                 singleLine = true,
@@ -126,23 +144,22 @@ fun ChatClientScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            // --- BOTÃO ENVIAR (Refatorado) ---
+            // --- BOTÃO ENVIAR ---
             CustomButton(
                 text = "Enviar",
                 onClick = {
                     if (inputText.isNotBlank()) {
-                        messages.add(
-                            ChatMessage(
-                                senderId = "client_1",
-                                senderType = "CLIENT",
-                                content = inputText
-                            )
+                        val newMessage = ChatMessage(
+                            senderId = customerEmail,
+                            senderType = "CLIENT",
+                            content = inputText,
+                            timestamp = com.google.firebase.Timestamp.now()
                         )
-                        inputText = ""
-
-                        coroutineScope.launch {
-                            listState.animateScrollToItem(messages.size)
-                        }
+                        
+                        ticketRepository.sendMessage(ticketId, newMessage, 
+                            onSuccess = { inputText = "" },
+                            onError = { /* Tratar erro */ }
+                        )
                     }
                 },
                 containerColor = Color(0xFF4CAF50),

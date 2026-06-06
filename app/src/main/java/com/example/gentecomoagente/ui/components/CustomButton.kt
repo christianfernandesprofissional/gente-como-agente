@@ -13,12 +13,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
 
 @Composable
 fun CustomButton(
@@ -32,23 +34,51 @@ fun CustomButton(
     elevation: Dp = 0.dp,
     fontSize: TextUnit = 14.sp,
     fontWeight: FontWeight = FontWeight.SemiBold,
-    icon: ImageVector? = null
+
+    // 🔥 NOVO: suporte a ImageVector OU Painter
+    icon: ImageVector? = null,
+    iconPainter: Painter? = null,
+
+    enabled: Boolean = true
 ) {
     Button(
         onClick = onClick,
         modifier = modifier.heightIn(min = 28.dp),
+        enabled = enabled,
         shape = shape,
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
-            contentColor = contentColor
+            contentColor = contentColor,
+            disabledContainerColor = containerColor.copy(alpha = 0.5f),
+            disabledContentColor = contentColor.copy(alpha = 0.5f)
         ),
         elevation = ButtonDefaults.buttonElevation(defaultElevation = elevation),
         contentPadding = contentPadding
     ) {
-        if (icon != null) {
-            Icon(imageVector = icon, contentDescription = null)
-            Spacer(modifier = Modifier.width(8.dp))
+
+        when {
+            icon != null -> {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+
+            iconPainter != null -> {
+                Icon(
+                    painter = iconPainter,
+                    contentDescription = null,
+                    tint = Color.Unspecified // 🔥 mantém as cores originais do PNG/SVG
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+            }
         }
-        Text(text = text, fontSize = fontSize, fontWeight = fontWeight)
+
+        Text(
+            text = text,
+            fontSize = fontSize,
+            fontWeight = fontWeight
+        )
     }
 }

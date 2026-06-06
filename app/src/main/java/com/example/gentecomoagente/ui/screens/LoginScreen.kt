@@ -2,6 +2,7 @@ package com.example.gentecomoagente.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -39,14 +40,15 @@ fun LoginScreen(navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
+            .statusBarsPadding()
     ) {
 
-        CustomTopHeader(
-            buttonText = "Voltar",
-            buttonIcon = Icons.Default.ArrowBack,
-            onClickButton = {
-                navController.popBackStack()
-            }
+        CustomButton(
+            text = "Voltar",
+            onClick = { navController.popBackStack() },
+            shape = RoundedCornerShape(15),
+            containerColor = Color(0xFFE0E0E0),
+            contentColor = Color.Black
         )
 
         Box(

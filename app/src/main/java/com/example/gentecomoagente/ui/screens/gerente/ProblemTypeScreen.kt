@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Divider
@@ -49,12 +50,15 @@ fun ProblemTypeScreen(navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
+            .statusBarsPadding()
     ) {
         // --- 2. CABEÇALHO (Refatorado com CustomTopHeader!) ---
-        CustomTopHeader(
-            buttonText = "Voltar",
-            buttonIcon = Icons.Default.ArrowBack,
-            onClickButton = { navController.popBackStack() }
+        CustomButton(
+            text = "Voltar",
+            onClick = { navController.popBackStack() },
+            shape = RoundedCornerShape(15),
+            containerColor = Color(0xFFE0E0E0),
+            contentColor = Color.Black
         )
 
         // Identificação do Gerente
@@ -96,7 +100,8 @@ fun ProblemTypeScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.White)
-                .padding(16.dp),
+                .padding(16.dp)
+                .navigationBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Divider(color = Color(0xFFEEEEEE), thickness = 1.dp)
