@@ -23,16 +23,20 @@ import com.example.gentecomoagente.ui.components.CustomDropdown
 import com.example.gentecomoagente.ui.components.CustomTextField
 import com.example.gentecomoagente.ui.navigation.Routes
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
 fun HomeScreen(navController: NavController) {
     val problemRepository = remember { ProblemTypeRepository() }
     val ticketRepository = remember { TicketRepository() }
+
+    val auth = FirebaseAuth.getInstance()
+    val currentEmail = auth.currentUser?.email ?: ""
     
     // ESTADOS
     var nome by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf(currentEmail) }
     var descricao by remember { mutableStateOf("") }
 
     var problemTypes by remember { mutableStateOf<List<ProblemTypeModel>>(emptyList()) }
@@ -80,10 +84,14 @@ fun HomeScreen(navController: NavController) {
                     .verticalScroll(rememberScrollState())
             ) {
                 // --- CABEÇALHO ESPECÍFICO DESTA TELA ---
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     CustomButton(
-                        text = "Acessar como Funcionário",
-                        onClick = { navController.navigate(Routes.LOGIN) }
+                        text = "Voltar",
+                        onClick = { navController.popBackStack() }
                     )
                 }
 
@@ -122,7 +130,8 @@ fun HomeScreen(navController: NavController) {
                 CustomTextField(
                     label = "Email",
                     value = email,
-                    onValueChange = { email = it }
+                    onValueChange = { },
+                    readOnly = true
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -151,11 +160,11 @@ fun HomeScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    CustomButton(
-                        text = "Ticket Existente",
-                        onClick = { navController.navigate(Routes.TICKET_EXISTENTE) },
-                        modifier = Modifier.weight(1f)
-                    )
+//                    CustomButton(
+//                        text = "Ticket Existente",
+//                        onClick = { navController.navigate(Routes.TICKET_EXISTENTE) },
+//                        modifier = Modifier.weight(1f)
+//                    )
 
                     CustomButton(
                         text = if (isLoading) "Enviando..." else "Iniciar Atendimento",

@@ -58,7 +58,6 @@ fun TicketsAgentScreen(navController: NavController) {
         "Data de Criação",
         "Última Mensagem",
         "Abertos",
-        "Em Andamento",
         "Fechados"
     )
 
@@ -96,12 +95,6 @@ fun TicketsAgentScreen(navController: NavController) {
                 )
             }
 
-            "Em Andamento" -> {
-                query.whereEqualTo(
-                    "status",
-                    "IN_PROGRESS"
-                )
-            }
 
             "Fechados" -> {
                 query.whereEqualTo(
@@ -173,7 +166,7 @@ fun TicketsAgentScreen(navController: NavController) {
             onClick = {
                 authRepository.logout()
 
-                navController.navigate(Routes.TELA_INICIAL) {
+                navController.navigate(Routes.LOGIN_Google) {
                     popUpTo(0)
                 }
             },
@@ -293,7 +286,7 @@ fun TicketsAgentScreen(navController: NavController) {
                             onActionClick = {
                                 Log.d("CHAT", "ticketId recebido: ${ticket.id}")
                                 if (agentRole.isNotBlank()) {
-                                    navController.navigate("${Routes.CHAT_GERAL}/${ticket.id}/$agentRole")
+                                    navController.navigate("${Routes.CHAT_GERAL}/${ticket.id}/${agentRole.uppercase()}")
                                 }
                             }
                         )

@@ -1,5 +1,6 @@
 package com.example.gentecomoagente.ui.screens.client
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -14,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -30,7 +32,7 @@ import com.google.firebase.Timestamp
 @Composable
 fun ChatScreen(navController: NavController, ticketId: String, userType: String) {
     val ticketRepository = remember { TicketRepository() }
-    
+    val context = LocalContext.current
     // ESTADOS
     var inputText by remember { mutableStateOf("") }
     val messages = remember { mutableStateListOf<ChatMessage>() }
@@ -76,7 +78,8 @@ fun ChatScreen(navController: NavController, ticketId: String, userType: String)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(16.dp)
+                .statusBarsPadding(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -93,10 +96,20 @@ fun ChatScreen(navController: NavController, ticketId: String, userType: String)
                 CustomButton(
                     text = "Encerrar Ticket",
                     onClick = {
-                        //ticketRepository.updateTicketStatus(ticketId, "CLOSED",
-                         //   onSuccess = { ticketStatus = "CLOSED" },
-                         //   onError = { /* Tratar erro */ }
-                       // )
+                        ticketRepository.updateTicketStatus(
+                            ticketId,
+                            "CLOSED",
+                            onSuccess = {
+                                ticketStatus = "CLOSED"
+                            },
+                            onError = { error ->
+                                Toast.makeText(
+                                    context,
+                                    error,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        )
                     },
                     containerColor = Color(0xFFE57373),
                     contentColor = Color.White

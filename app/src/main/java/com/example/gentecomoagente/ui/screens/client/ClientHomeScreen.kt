@@ -26,6 +26,8 @@ import com.example.gentecomoagente.ui.components.CustomTopHeader
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import com.example.gentecomoagente.ui.navigation.Routes
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 @Composable
@@ -149,6 +151,10 @@ fun ClientHomeScreen(navController: NavController) {
 @Composable
 fun GerenteTicketCard(ticket: TicketModel, navController: NavController) {
 
+    val dateFormatted = ticket.createdAt?.toDate()?.let { date ->
+        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(date)
+    }
+
     val statusText = when (ticket.status) {
         "OPEN" -> "Não iniciado"
         "IN_PROGRESS" -> "Em andamento"
@@ -169,6 +175,13 @@ fun GerenteTicketCard(ticket: TicketModel, navController: NavController) {
             // 🔹 Problema (agora é problemType)
             Text(
                 text = "Problema: ${ticket.problemType}",
+                fontSize = 15.sp,
+                color = Color.Black,
+                fontWeight = FontWeight.Medium
+            )
+
+            Text(
+                text = "Data de criação: ${dateFormatted}",
                 fontSize = 15.sp,
                 color = Color.Black,
                 fontWeight = FontWeight.Medium

@@ -132,6 +132,22 @@ class TicketRepository {
             }
     }
 
+    fun updateTicketStatus(
+        ticketId: String,
+        newStatus: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        collection.document(ticketId)
+            .update("status", newStatus)
+            .addOnSuccessListener {
+                onSuccess()
+            }
+            .addOnFailureListener { e ->
+                onError(e.message ?: "Erro ao atualizar status")
+            }
+    }
+
     fun findTicketsByCustomerEmail(
         email: String,
         onSuccess: (List<TicketModel>) -> Unit,

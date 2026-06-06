@@ -87,7 +87,7 @@ fun GerenteHomeScreen(navController: NavController) {
         topBar = {
             Column(modifier = Modifier.fillMaxWidth()) {
 
-                Row(modifier = Modifier.fillMaxWidth()) {
+                Row(modifier = Modifier.fillMaxWidth().statusBarsPadding()) {
 
                     CustomButton(
                         text = "Sair",
@@ -95,7 +95,7 @@ fun GerenteHomeScreen(navController: NavController) {
 
                             authRepository.logout()
 
-                            navController.navigate(Routes.TELA_INICIAL) {
+                            navController.navigate(Routes.LOGIN_Google) {
 
                                 popUpTo(0)
                             }
@@ -103,7 +103,7 @@ fun GerenteHomeScreen(navController: NavController) {
                         modifier = Modifier
                             .weight(1f)
                             .height(48.dp),
-                        shape = RectangleShape,
+                        shape = RoundedCornerShape(15),
                         containerColor = Color(0xFFE0E0E0),
                         contentColor = Color.Black
                     )
@@ -118,7 +118,7 @@ fun GerenteHomeScreen(navController: NavController) {
                         modifier = Modifier
                             .weight(1f)
                             .height(48.dp),
-                        shape = RectangleShape,
+                        shape = RoundedCornerShape(15),
                         containerColor = Color(0xFFE0E0E0),
                         contentColor = Color.Black
                     )
@@ -229,7 +229,7 @@ fun GerenteHomeScreen(navController: NavController) {
         // --- RODAPÉ ---
         bottomBar = {
 
-            Row(modifier = Modifier.fillMaxWidth()) {
+            Row(modifier = Modifier.fillMaxWidth().navigationBarsPadding()) {
 
                 CustomButton(
                     text = "Visualizar Tickets",
@@ -239,7 +239,7 @@ fun GerenteHomeScreen(navController: NavController) {
                     modifier = Modifier
                         .weight(1f)
                         .height(56.dp),
-                    shape = RectangleShape,
+                    shape = RoundedCornerShape(15),
                     containerColor = Color(0xFFE0E0E0),
                     contentColor = Color.Black
                 )
@@ -254,7 +254,7 @@ fun GerenteHomeScreen(navController: NavController) {
                     modifier = Modifier
                         .weight(1f)
                         .height(56.dp),
-                    shape = RectangleShape,
+                    shape = RoundedCornerShape(15),
                     containerColor = Color(0xFFE0E0E0),
                     contentColor = Color.Black
                 )
