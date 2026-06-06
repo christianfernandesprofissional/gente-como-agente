@@ -225,7 +225,7 @@ fun HomeScreen(navController: NavController) {
             confirmButton = {
                 TextButton(onClick = {
                     showSuccessDialog = false
-                    navController.navigate("${Routes.CHAT_CLIENT}/$createdTicketId")
+                    navController.navigate("${Routes.CHAT_GERAL}/$createdTicketId/CLIENT")
                 }) {
                     Text("Ir para o Atendimento")
                 }

@@ -160,6 +160,7 @@ fun TicketsAgentScreen(navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
+            .statusBarsPadding()
     ) {
         CustomButton(
             text = "Sair",

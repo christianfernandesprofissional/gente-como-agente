@@ -37,12 +37,12 @@ class TicketRepository {
 
             // 2. Preparar o ID sequencial
             val sequentialId = "TCK-$nextId"
-            
+
             // 3. Gerar código de acesso (Hash baseado no ID, Email e Timestamp)
             val timestamp = ticket.createdAt?.toDate()?.time ?: System.currentTimeMillis()
             val rawString = "$sequentialId-${ticket.customerEmail}-$timestamp"
             val accessCode = generateHash(rawString)
-            
+
             val ticketWithData = ticket.copy(accessCode = accessCode)
 
             // 4. Criar o documento do ticket com o ID personalizado
@@ -80,11 +80,27 @@ class TicketRepository {
             .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.ASCENDING)
             .addSnapshotListener { snapshot, e ->
                 if (e != null || snapshot == null) return@addSnapshotListener
-                
+
                 val messages = snapshot.documents.mapNotNull { doc ->
                     doc.toObject(com.example.gentecomoagente.model.ChatMessage::class.java)
                 }
                 onUpdate(messages)
+            }
+    }
+
+    fun listenToTicket(
+        ticketId: String,
+        onUpdate: (TicketModel?) -> Unit
+    ) {
+        FirebaseFirestore.getInstance()
+            .collection("tickets")
+            .document(ticketId)
+            .addSnapshotListener { snapshot, error ->
+
+                if (error != null || snapshot == null) return@addSnapshotListener
+
+                val ticket = snapshot.toObject(TicketModel::class.java)
+                onUpdate(ticket)
             }
     }
 

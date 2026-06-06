@@ -42,14 +42,13 @@ fun ChatScreen(navController: NavController, ticketId: String, userType: String)
 
     // Carregar dados do ticket
     LaunchedEffect(ticketId) {
-        ticketRepository.getTicket(ticketId, 
-            onSuccess = { ticket ->
-                accessCode = ticket?.accessCode ?: "N/A"
-                customerEmail = ticket?.customerEmail ?: ""
-                ticketStatus = ticket?.status ?: "OPEN"
-            },
-            onError = { /* Tratar erro */ }
-        )
+        ticketRepository.listenToTicket(ticketId) { ticket ->
+            if (ticket != null) {
+                accessCode = ticket.accessCode
+                customerEmail = ticket.customerEmail
+                ticketStatus = ticket.status
+            }
+        }
     }
 
     // Escutar mensagens em tempo real
@@ -156,7 +155,8 @@ fun ChatScreen(navController: NavController, ticketId: String, userType: String)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .navigationBarsPadding(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
@@ -204,7 +204,8 @@ fun ChatScreen(navController: NavController, ticketId: String, userType: String)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .navigationBarsPadding(),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
