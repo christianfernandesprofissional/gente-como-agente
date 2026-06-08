@@ -234,7 +234,7 @@ fun GerenteHomeScreen(navController: NavController) {
                 CustomButton(
                     text = "Visualizar Tickets",
                     onClick = {
-                        navController.navigate(Routes.GERENTE_TICKETS)
+                        navController.navigate(Routes.TICKETS_AGENT)
                     },
                     modifier = Modifier
                         .weight(1f)
