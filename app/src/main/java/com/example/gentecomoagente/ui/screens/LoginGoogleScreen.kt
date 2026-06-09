@@ -3,6 +3,7 @@ package com.example.gentecomoagente.ui.screens
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -12,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -130,6 +132,16 @@ fun LoginGoogleScreen(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
+                Image(
+                    painter = painterResource(
+                        id = R.drawable.logo_gente_como_agente
+                    ),
+                    contentDescription = "Logo Gente como Agente",
+                    modifier = Modifier
+                        .size(220.dp)
+                        .padding(bottom = 32.dp),
+                    contentScale = ContentScale.Fit
+                )
 
                 CustomButton(
                     text = "Acessar como Funcionário",
