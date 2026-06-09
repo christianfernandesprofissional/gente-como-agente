@@ -1,6 +1,9 @@
 package com.example.gentecomoagente.repository
 
 import android.content.Context
+import androidx.compose.ui.platform.LocalContext
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 
@@ -93,6 +96,21 @@ class AuthRepository(
     fun logout() {
         clearAdminCredentials()
         auth.signOut()
+    }
+
+    fun logoutGoogle(context: Context, onComplete: () -> Unit) {
+
+        FirebaseAuth.getInstance().signOut()
+
+        val googleSignInClient = GoogleSignIn.getClient(
+            context,
+            GoogleSignInOptions.DEFAULT_SIGN_IN
+        )
+
+        googleSignInClient.signOut()
+            .addOnCompleteListener {
+                onComplete()
+            }
     }
 
     // 👤 UID ATUAL

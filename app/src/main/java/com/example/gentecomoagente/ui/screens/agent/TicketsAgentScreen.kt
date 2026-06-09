@@ -156,6 +156,25 @@ fun TicketsAgentScreen(navController: NavController) {
         carregarTickets("Data de Criação")
     }
 
+
+    val buttonText = if (agentRole == "admin") {
+        "Voltar"
+    } else {
+        "Sair"
+    }
+
+    val buttonAction = {
+        if (agentRole == "admin") {
+            navController.popBackStack()
+        } else {
+            authRepository.logout()
+
+            navController.navigate(Routes.LOGIN_Google) {
+                popUpTo(0)
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -163,12 +182,16 @@ fun TicketsAgentScreen(navController: NavController) {
             .statusBarsPadding()
     ) {
         CustomButton(
-            text = "Sair",
+            text = if (agentRole == "admin") "Voltar" else "Sair",
             onClick = {
-                authRepository.logout()
+                if (agentRole == "admin") {
+                    navController.popBackStack()
+                } else {
+                    authRepository.logout()
 
-                navController.navigate(Routes.LOGIN_Google) {
-                    popUpTo(0)
+                    navController.navigate(Routes.LOGIN_Google) {
+                        popUpTo(0)
+                    }
                 }
             },
             modifier = Modifier

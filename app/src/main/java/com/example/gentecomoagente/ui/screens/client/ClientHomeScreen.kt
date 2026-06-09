@@ -25,6 +25,7 @@ import com.example.gentecomoagente.ui.components.CustomButton
 import com.example.gentecomoagente.ui.components.CustomTopHeader
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import com.example.gentecomoagente.ui.navigation.Routes
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -32,6 +33,8 @@ import java.util.Locale
 
 @Composable
 fun ClientHomeScreen(navController: NavController) {
+
+    val context = LocalContext.current
 
     val ticketService = remember {
         TicketService()
@@ -98,7 +101,13 @@ fun ClientHomeScreen(navController: NavController) {
 
             CustomButton(
                 text = "Sair",
-                onClick =  { navController.popBackStack() },
+                onClick = {
+                    authRepository.logoutGoogle(context) {
+                        navController.navigate(Routes.LOGIN_Google) {
+                            popUpTo(0)
+                        }
+                    }
+                },
                 modifier = Modifier.weight(1f)
             )
 
