@@ -22,7 +22,6 @@ import com.example.gentecomoagente.model.TicketModel
 import com.example.gentecomoagente.repository.AuthRepository
 import com.example.gentecomoagente.service.TicketService
 import com.example.gentecomoagente.ui.components.CustomButton
-import com.example.gentecomoagente.ui.components.CustomTopHeader
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
@@ -69,7 +68,10 @@ fun ClientHomeScreen(navController: NavController) {
 
             onSuccess = { lista ->
 
-                tickets = lista
+                tickets = lista.sortedByDescending {
+                    it.createdAt?.toDate()?.time ?: 0L
+                }
+
                 isLoading = false
             },
 
@@ -113,7 +115,7 @@ fun ClientHomeScreen(navController: NavController) {
 
             CustomButton(
                 text = "Novo atendimento",
-                onClick = { navController.navigate(Routes.TELA_INICIAL) },
+                onClick = { navController.navigate(Routes.CREATE_TICKET_SCREEN) },
                 modifier = Modifier.weight(1f)
             )
         }
@@ -165,8 +167,8 @@ fun GerenteTicketCard(ticket: TicketModel, navController: NavController) {
     }
 
     val statusText = when (ticket.status) {
-        "OPEN" -> "Não iniciado"
-        "IN_PROGRESS" -> "Em andamento"
+        "OPEN" -> "Em andamento"
+        "IN_PROGRESS" -> "Sendo atendido"
         "CLOSED" -> "Finalizado"
         else -> ticket.status
     }

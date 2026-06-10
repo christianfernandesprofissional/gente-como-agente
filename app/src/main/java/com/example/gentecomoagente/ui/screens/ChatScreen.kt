@@ -1,4 +1,4 @@
-package com.example.gentecomoagente.ui.screens.client
+package com.example.gentecomoagente.ui.screens
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -23,7 +23,6 @@ import com.example.gentecomoagente.model.ChatMessage
 import com.example.gentecomoagente.repository.TicketRepository
 import com.example.gentecomoagente.ui.components.ChatMessageBubble
 import com.example.gentecomoagente.ui.components.CustomButton
-import com.example.gentecomoagente.ui.components.TypingIndicator
 import com.google.firebase.Timestamp
 
 
@@ -91,7 +90,7 @@ fun ChatScreen(navController: NavController, ticketId: String, userType: String)
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
             )
 
-            if (userType == "AGENT" && ticketStatus != "CLOSED") {
+            if ((userType == "AGENT" || userType == "ADMIN") && ticketStatus != "CLOSED") {
                 CustomButton(
                     text = "Encerrar Ticket",
                     onClick = {

@@ -40,6 +40,11 @@ fun AgentCreationScreen(navController: NavController) {
 
     val roles = listOf("admin", "agent")
 
+    val roleLabels = mapOf(
+        "admin" to "Gerente",
+        "agent" to "Agente"
+    )
+
     val context = LocalContext.current
 
     val agentService = remember {
@@ -122,11 +127,11 @@ fun AgentCreationScreen(navController: NavController) {
                 ) {
 
                     OutlinedTextField(
-                        value = selectedRole,
+                        value = roleLabels[selectedRole] ?: selectedRole,
                         onValueChange = {},
                         readOnly = true,
                         label = {
-                            Text("Role")
+                            Text("Função")
                         },
                         trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(
@@ -153,7 +158,7 @@ fun AgentCreationScreen(navController: NavController) {
 
                             DropdownMenuItem(
                                 text = {
-                                    Text(role)
+                                    Text(roleLabels[role] ?: role)
                                 },
                                 onClick = {
                                     selectedRole = role
