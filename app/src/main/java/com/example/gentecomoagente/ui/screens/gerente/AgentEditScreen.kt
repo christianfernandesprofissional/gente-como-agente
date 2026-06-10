@@ -59,6 +59,11 @@ fun AgentEditScreen(
 
     val roles = listOf("admin", "agent")
 
+    val roleLabels = mapOf(
+        "admin" to "Gerente",
+        "agent" to "Agente"
+    )
+
     val context = LocalContext.current
 
     LaunchedEffect(agentId) {
@@ -189,7 +194,7 @@ fun AgentEditScreen(
                 ) {
 
                     OutlinedTextField(
-                        value = selectedRole,
+                        value = roleLabels[selectedRole] ?: selectedRole,
                         onValueChange = {},
                         readOnly = true,
 
@@ -225,7 +230,7 @@ fun AgentEditScreen(
 
                             DropdownMenuItem(
                                 text = {
-                                    Text(role)
+                                    Text(roleLabels[role] ?: role)
                                 },
 
                                 onClick = {

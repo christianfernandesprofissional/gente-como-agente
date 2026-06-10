@@ -4,8 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,12 +17,11 @@ import com.example.gentecomoagente.repository.AgentRepository
 import com.example.gentecomoagente.repository.AuthRepository
 import com.example.gentecomoagente.ui.components.CustomButton
 import com.example.gentecomoagente.ui.components.CustomTextField
-import com.example.gentecomoagente.ui.components.CustomTopHeader
 import com.example.gentecomoagente.ui.components.showToast
 import com.example.gentecomoagente.ui.navigation.Routes
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginCompanyScreen(navController: NavController) {
 
     val context = LocalContext.current
 

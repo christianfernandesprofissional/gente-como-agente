@@ -32,6 +32,7 @@ import com.example.gentecomoagente.ui.navigation.Routes
 import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.clip
 import com.example.gentecomoagente.repository.AgentRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ListenerRegistration
@@ -55,14 +56,14 @@ fun TicketsAgentScreen(navController: NavController) {
     var expandedFiltro by remember { mutableStateOf(false) }
 
     val filtros = listOf(
-        "Data de Criação",
-        "Última Mensagem",
         "Abertos",
-        "Fechados"
+        "Fechados",
+        "Data de Criação",
+        "Última Mensagem"
     )
 
     var filtroSelecionado by remember {
-        mutableStateOf("Data de Criação")
+        mutableStateOf("Abertos")
     }
 
     fun carregarTickets(filtro: String) {
@@ -153,7 +154,7 @@ fun TicketsAgentScreen(navController: NavController) {
                 }
         }
 
-        carregarTickets("Data de Criação")
+        carregarTickets("Abertos")
     }
 
 
@@ -329,6 +330,11 @@ fun TicketListItem(
     onActionClick: () -> Unit
 ) {
 
+    val backgroundColor = when (ticket.status) {
+        "CLOSED" -> Color(0xFFFFCDD2) // vermelho claro
+        else -> Color(0xFFF5F5F5)     // cinza padrão
+    }
+
     val statusText = when (ticket.status) {
         "OPEN" -> "Aberto"
         "IN_PROGRESS" -> "Em andamento"
@@ -355,7 +361,10 @@ fun TicketListItem(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFF5F5F5))
+                .background(
+                    color = backgroundColor,
+                    shape = RoundedCornerShape(10.dp)
+                )
                 .padding(12.dp)
         ) {
 

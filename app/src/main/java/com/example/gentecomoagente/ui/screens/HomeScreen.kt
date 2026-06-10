@@ -1,235 +1,168 @@
 package com.example.gentecomoagente.ui.screens
 
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.gentecomoagente.model.ProblemTypeModel
-import com.example.gentecomoagente.model.TicketModel
-import com.example.gentecomoagente.repository.ProblemTypeRepository
-import com.example.gentecomoagente.repository.TicketRepository
+import com.example.gentecomoagente.repository.AuthRepository
 import com.example.gentecomoagente.ui.components.CustomButton
-import com.example.gentecomoagente.ui.components.CustomDropdown
-import com.example.gentecomoagente.ui.components.CustomTextField
 import com.example.gentecomoagente.ui.navigation.Routes
-import com.google.firebase.Timestamp
-import com.google.firebase.auth.FirebaseAuth
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.example.gentecomoagente.R
 
 
 @Composable
 fun HomeScreen(navController: NavController) {
-    val problemRepository = remember { ProblemTypeRepository() }
-    val ticketRepository = remember { TicketRepository() }
 
-    val auth = FirebaseAuth.getInstance()
-    val currentEmail = auth.currentUser?.email ?: ""
-    
-    // ESTADOS
-    var nome by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf(currentEmail) }
-    var descricao by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
-    var problemTypes by remember { mutableStateOf<List<ProblemTypeModel>>(emptyList()) }
-    var problemaSelecionado by remember { mutableStateOf("") }
+    val authRepository = remember { AuthRepository(context) }
 
-    var showSuccessDialog by remember { mutableStateOf(false) }
-    var createdTicketId by remember { mutableStateOf("") }
-    var createdAccessCode by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 
-    val isFormValid = nome.isNotBlank() && email.isNotBlank() && descricao.isNotBlank() && problemaSelecionado.isNotBlank()
+    val googleSignInOptions = GoogleSignInOptions.Builder(
 
-    // Carregar tipos de problema do Firestore
-    LaunchedEffect(Unit) {
-        problemRepository.findAll(
-            onSuccess = { list ->
-                problemTypes = list
-                if (list.isNotEmpty()) {
-                    problemaSelecionado = list[0].name
-                }
-            },
-            onError = { /* Tratar erro se necessário */ }
+        GoogleSignInOptions.DEFAULT_SIGN_IN
+    )
+        .requestIdToken(
+            context.getString(R.string.default_web_client_id)
         )
-    }
+        .requestEmail()
+        .build()
 
-    val opcoesProblema = problemTypes.map { it.name }
+    val googleSignInClient = GoogleSignIn.getClient(
+        context,
+        googleSignInOptions
+    )
 
-    // Container Principal
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(1.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        // Card Branco Central
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
-        ) {
-            // Column com Scroll Vertical
-            Column(
-                modifier = Modifier
-                    .padding(24.dp)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                // --- CABEÇALHO ESPECÍFICO DESTA TELA ---
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    CustomButton(
-                        text = "Voltar",
-                        onClick = { navController.popBackStack() }
-                    )
-                }
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
 
-                Spacer(modifier = Modifier.height(16.dp))
+        Log.d("GOOGLE_LOGIN", "Launcher executado")
 
-                Text(
-                    text = "Centro de Suporte ao Cliente",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
+        try {
 
-                Spacer(modifier = Modifier.height(8.dp))
+            val task = GoogleSignIn.getSignedInAccountFromIntent(
+                result.data
+            )
 
-                Text(
-                    text = "Inicie um novo atendimento ou informe o Ticket para continuar uma conversa",
-                    fontSize = 14.sp,
-                    color = Color.Gray
-                )
+            Log.d("GOOGLE_LOGIN", "Task criada")
 
-                Spacer(modifier = Modifier.height(16.dp))
+            val account = task.getResult(
+                ApiException::class.java
+            )
 
-                Divider(color = Color(0xFF81D4FA), thickness = 1.dp) // Linha azul clara
+            Log.d(
+                "GOOGLE_LOGIN",
+                "Conta: ${account.email}"
+            )
 
-                Spacer(modifier = Modifier.height(24.dp))
+            val idToken = account.idToken
 
-                // --- FORMULÁRIO ---
-                CustomTextField(
-                    label = "Nome Completo",
-                    value = nome,
-                    onValueChange = { nome = it }
-                )
+            Log.d(
+                "GOOGLE_LOGIN",
+                "Token nulo? ${idToken == null}"
+            )
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                CustomTextField(
-                    label = "Email",
-                    value = email,
-                    onValueChange = { },
-                    readOnly = true
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                CustomDropdown(
-                    label = "Tipo de Problema",
-                    options = opcoesProblema,
-                    selectedOption = problemaSelecionado,
-                    onOptionSelected = { problemaSelecionado = it }
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                CustomTextField(
-                    label = "Descrição do Problema",
-                    value = descricao,
-                    onValueChange = { descricao = it },
-                    singleLine = false,
-                    minLines = 4
-                )
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                // --- RODAPÉ (Botões Lado a Lado) ---
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-//                    CustomButton(
-//                        text = "Ticket Existente",
-//                        onClick = { navController.navigate(Routes.TICKET_EXISTENTE) },
-//                        modifier = Modifier.weight(1f)
-//                    )
-
-                    CustomButton(
-                        text = if (isLoading) "Enviando..." else "Iniciar Atendimento",
-                        onClick = {
-                            isLoading = true
-                            val newTicket = TicketModel(
-                                customerName = nome,
-                                customerEmail = email,
-                                problemType = problemaSelecionado,
-                                status = "OPEN",
-                                createdAt = Timestamp.now(),
-                                lastMessage = descricao,
-                                lastMessageAt = Timestamp.now()
-                            )
-
-                            ticketRepository.createTicket(
-                                ticket = newTicket,
-                                initialMessage = descricao,
-                                onSuccess = { id, accessCode ->
-                                    createdTicketId = id
-                                    createdAccessCode = accessCode
-                                    showSuccessDialog = true
-                                    isLoading = false
-                                },
-                                onError = { error ->
-                                    isLoading = false
-                                    Log.e("HomeScreen", "Erro ao criar ticket: $error")
-                                }
-                            )
-                        },
-                        enabled = isFormValid && !isLoading,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
+            if (idToken == null) {
+                return@rememberLauncherForActivityResult
             }
+
+            authRepository.loginWithGoogle(
+                idToken = idToken,
+                onSuccess = {
+                    Log.d("GOOGLE_LOGIN", "Firebase OK")
+                    navController.navigate(Routes.CLIENT_HOME)
+                },
+                onError = {
+                    Log.e("GOOGLE_LOGIN", it)
+                }
+            )
+
+        } catch (e: Exception) {
+
+            Log.e(
+                "GOOGLE_LOGIN",
+                e.stackTraceToString()
+            )
         }
     }
 
-    if (showSuccessDialog) {
-        AlertDialog(
-            onDismissRequest = { showSuccessDialog = false },
-            title = { Text("Ticket Criado com Sucesso!") },
-            text = {
-                Column {
-                    Text("Número do Ticket:", fontSize = 14.sp)
-                    Text(text = createdTicketId, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1976D2))
-                    
-                    Spacer(modifier = Modifier.height(12.dp))
-                    
-                    Text("Código de Acesso:", fontSize = 14.sp)
-                    Text(text = createdAccessCode, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFFD32F2F))
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    Text("IMPORTANTE: Guarde esses dados para consultar seu atendimento futuramente.", fontSize = 12.sp, color = Color.Gray)
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    showSuccessDialog = false
-                    navController.navigate("${Routes.CHAT_GERAL}/$createdTicketId/CLIENT")
-                }) {
-                    Text("Ir para o Atendimento")
-                }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
+
+
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp),
+            contentAlignment = Alignment.Center
+        ) {
+
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                Image(
+                    painter = painterResource(
+                        id = R.drawable.logo_gente_como_agente
+                    ),
+                    contentDescription = "Logo Gente como Agente",
+                    modifier = Modifier
+                        .size(220.dp)
+                        .padding(bottom = 32.dp),
+                    contentScale = ContentScale.Fit
+                )
+
+                CustomButton(
+                    text = "Acessar como Funcionário",
+                    onClick = { navController.navigate(Routes.LOGIN) }
+                )
+
+                // 🔥 BOTÃO LOGIN
+                CustomButton(
+                    text = if (isLoading)
+                        "Entrando..."
+                    else
+                        "Login com Google",
+
+                    iconPainter = painterResource(
+                        id = R.drawable.icon_google
+                    ),
+                    onClick = {
+
+                        isLoading = true
+
+                        launcher.launch(
+                            googleSignInClient.signInIntent
+                        )
+                    },
+
+                    modifier = Modifier.fillMaxWidth(0.6f),
+
+                    containerColor = Color(0xFFBDBDBD)
+                )
             }
-        )
+        }
     }
 }
